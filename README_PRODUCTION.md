@@ -17,8 +17,12 @@ npm run build
 - `dist/` - קבצי הפרונטאנד הבנויים
 - `server.js` - השרת
 - `package.json` - התלויות
-- `data/` - תיקיית הנתונים (תיווצר אוטומטית)
+- `data/` - **תיקיית הנתונים הקיימים (חשוב מאוד!)**
+  - `projects.json` - כל הפרויקטים שלך
+  - `categories.json` - הקטגוריות שיצרת
+  - `suppliers.json` - רשימת הספקים
 - `logo.png` - לוגו האפליקציה
+- `.gitkeep` - קובץ לשמירת תיקיית data
 
 ### 3. התקנה בשרת
 ```bash
@@ -27,6 +31,17 @@ npm install --production
 
 # הרצת השרת
 npm start
+```
+
+### 4. הרשאות תיקיית נתונים (חשוב!)
+ודא שלשרת יש הרשאות כתיבה לתיקיית data:
+```bash
+# Linux/Mac
+chmod 755 data/
+chmod 644 data/*.json
+
+# או אם צריך יותר הרשאות:
+chmod 777 data/
 ```
 
 ## קובץ .env לפרודקשן (אופציונלי)

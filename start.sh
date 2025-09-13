@@ -34,6 +34,14 @@ if [ ! -d "data" ]; then
     mkdir data
 fi
 
+# הגדרת הרשאות לתיקיית נתונים
+echo "🔒 מגדיר הרשאות לתיקיית הנתונים..."
+chmod 755 data/
+if [ -f "data/projects.json" ]; then
+    chmod 644 data/*.json
+    echo "✅ נמצאו נתונים קיימים - ישמרו בשרת"
+fi
+
 echo "🚀 מפעיל את השרת..."
 echo "🌐 האפליקציה תהיה זמינה ב: http://localhost:3001"
 echo "👤 שם משתמש: litalb"

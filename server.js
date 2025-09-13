@@ -31,15 +31,23 @@ async function ensureDataDir() {
 async function initializeDataFiles() {
   await ensureDataDir();
   
+  console.log('📁 Checking data files...');
+  
   try {
     await fs.access(PROJECTS_FILE);
+    const projects = JSON.parse(await fs.readFile(PROJECTS_FILE, 'utf8'));
+    console.log(`✅ Found ${projects.length} existing projects`);
   } catch {
+    console.log('📝 Creating new projects file...');
     await fs.writeFile(PROJECTS_FILE, JSON.stringify([], null, 2));
   }
   
   try {
     await fs.access(CATEGORIES_FILE);
+    const categories = JSON.parse(await fs.readFile(CATEGORIES_FILE, 'utf8'));
+    console.log(`✅ Found ${categories.length} existing categories`);
   } catch {
+    console.log('📝 Creating default categories...');
     const defaultCategories = [
       { id: '1', name: 'חומרי בנייה' },
       { id: '2', name: 'קבלני משנה' },
@@ -50,7 +58,10 @@ async function initializeDataFiles() {
   
   try {
     await fs.access(SUPPLIERS_FILE);
+    const suppliers = JSON.parse(await fs.readFile(SUPPLIERS_FILE, 'utf8'));
+    console.log(`✅ Found ${suppliers.length} existing suppliers`);
   } catch {
+    console.log('📝 Creating default suppliers...');
     const defaultSuppliers = [
       { 
         id: '1', 
@@ -76,10 +87,12 @@ async function readJsonFile(filePath) {
 
 async function writeJsonFile(filePath, data) {
   try {
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+    const jsonString = JSON.stringify(data, null, 2);
+    await fs.writeFile(filePath, jsonString, 'utf8');
+    console.log(`💾 Saved data to ${filePath.split('/').pop()}`);
     return true;
   } catch (error) {
-    console.error(`Error writing ${filePath}:`, error);
+    console.error(`❌ Error writing to ${filePath}:`, error);
     return false;
   }
 }
