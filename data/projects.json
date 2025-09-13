@@ -1,0 +1,57 @@
+[
+  {
+    "name": "ניסיון",
+    "description": "",
+    "contractAmount": 10000,
+    "id": "2025-09-11T12:15:24.434Z",
+    "incomes": [
+      {
+        "date": "2025-09-13",
+        "description": "פנחס רוזן",
+        "amount": 1000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-13T13:11:33.587Z"
+      }
+    ],
+    "expenses": [
+      {
+        "category": "קבלני משנה",
+        "date": "2025-09-13",
+        "supplier": "מנ עשה זאת בהצלחה",
+        "description": "ניסיון",
+        "amount": 2000,
+        "id": "2025-09-13T13:11:50.964Z"
+      }
+    ],
+    "isArchived": true
+  },
+  {
+    "name": "פנחס רוזן 90 ",
+    "description": "גנאל ויסמין כהן",
+    "contractAmount": 755200,
+    "id": "2025-09-13T13:29:05.540Z",
+    "incomes": [
+      {
+        "date": "2025-03-04",
+        "description": "גנאל כהן",
+        "amount": 75520,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T14:03:17.922Z"
+      }
+    ],
+    "expenses": [
+      {
+        "category": "קבלני משנה",
+        "date": "2025-09-13",
+        "supplier": "מ.ע.ש פרויקטים ובניה",
+        "supplierId": "2025-09-13T13:53:53.338Z",
+        "description": "ריצוף וצבע",
+        "amount": 5000,
+        "hasVat": true,
+        "amountWithVat": 5900,
+        "id": "2025-09-13T13:55:44.890Z"
+      }
+    ],
+    "isArchived": false
+  }
+]
