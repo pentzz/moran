@@ -7,7 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "server": "node server.js",
-    "start": "npm run build && npm run server"
+    "start": "npm run build && npm run server",
+    "debug": "node debug-server.js"
   },
   "dependencies": {
     "react": "^19.1.1",

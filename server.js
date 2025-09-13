@@ -87,12 +87,42 @@ async function readJsonFile(filePath) {
 
 async function writeJsonFile(filePath, data) {
   try {
+    // בדיקה שהתיקייה קיימת
+    const dir = path.dirname(filePath);
+    try {
+      await fs.access(dir);
+      console.log(`✅ Directory exists: ${dir}`);
+    } catch {
+      console.log(`📁 Creating directory: ${dir}`);
+      await fs.mkdir(dir, { recursive: true });
+    }
+
+    // בדיקת הרשאות כתיבה
+    try {
+      await fs.access(dir, fs.constants.W_OK);
+      console.log(`✅ Write permissions OK for: ${dir}`);
+    } catch {
+      console.error(`❌ No write permissions for: ${dir}`);
+      throw new Error(`No write permissions for directory: ${dir}`);
+    }
+
     const jsonString = JSON.stringify(data, null, 2);
     await fs.writeFile(filePath, jsonString, 'utf8');
-    console.log(`💾 Saved data to ${filePath.split('/').pop()}`);
+    console.log(`💾 Successfully saved data to ${filePath.split('/').pop()} (${jsonString.length} bytes)`);
+    
+    // אימות שהקובץ נכתב
+    const verification = await fs.readFile(filePath, 'utf8');
+    if (verification === jsonString) {
+      console.log(`✅ File verification successful for ${filePath.split('/').pop()}`);
+    } else {
+      console.error(`❌ File verification FAILED for ${filePath.split('/').pop()}`);
+    }
+    
     return true;
   } catch (error) {
-    console.error(`❌ Error writing to ${filePath}:`, error);
+    console.error(`❌ Error writing to ${filePath}:`, error.message);
+    console.error(`📍 Current working directory: ${process.cwd()}`);
+    console.error(`📍 Absolute file path: ${path.resolve(filePath)}`);
     return false;
   }
 }
@@ -119,16 +149,24 @@ app.post('/api/auth/login', (req, res) => {
 // Projects endpoints
 app.get('/api/projects', async (req, res) => {
   try {
+    console.log('🔍 GET /api/projects - Reading projects...');
     const projects = await readJsonFile(PROJECTS_FILE);
+    console.log(`✅ Successfully read ${projects.length} projects`);
     res.json(projects);
   } catch (error) {
+    console.error('❌ Error fetching projects:', error);
     res.status(500).json({ error: 'שגיאה בקריאת הפרויקטים' });
   }
 });
 
 app.post('/api/projects', async (req, res) => {
   try {
+    console.log('📝 POST /api/projects - Creating new project...');
+    console.log('📋 Project data:', JSON.stringify(req.body, null, 2));
+    
     const projects = await readJsonFile(PROJECTS_FILE);
+    console.log(`📊 Current projects count: ${projects.length}`);
+    
     const newProject = {
       ...req.body,
       id: new Date().toISOString(),
@@ -137,15 +175,22 @@ app.post('/api/projects', async (req, res) => {
       isArchived: false
     };
     
+    console.log('🆕 New project created:', JSON.stringify(newProject, null, 2));
+    
     projects.push(newProject);
+    console.log(`📈 Total projects after adding: ${projects.length}`);
+    
     const success = await writeJsonFile(PROJECTS_FILE, projects);
     
     if (success) {
+      console.log('✅ Project saved successfully!');
       res.json(newProject);
     } else {
+      console.error('❌ Failed to save project to file');
       res.status(500).json({ error: 'שגיאה בשמירת הפרויקט' });
     }
   } catch (error) {
+    console.error('❌ Error creating project:', error);
     res.status(500).json({ error: 'שגיאה ביצירת הפרויקט' });
   }
 });
@@ -469,13 +514,31 @@ app.get('*', (req, res) => {
 
 // Start server
 async function startServer() {
-  await initializeDataFiles();
-  
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📁 Data stored in: ${DATA_DIR}`);
-    console.log(`🌐 Access the app at: http://localhost:${PORT}`);
-  });
+  try {
+    console.log('🔧 Initializing server...');
+    console.log(`📁 Working directory: ${process.cwd()}`);
+    console.log(`📁 Data directory: ${DATA_DIR}`);
+    
+    // בדיקת הרשאות לתיקיית עבודה
+    try {
+      await fs.access(process.cwd(), fs.constants.W_OK);
+      console.log('✅ Write permissions OK for working directory');
+    } catch {
+      console.error('❌ No write permissions for working directory!');
+    }
+    
+    await initializeDataFiles();
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📁 Data stored in: ${DATA_DIR}`);
+      console.log(`🌐 Access the app at: http://localhost:${PORT}`);
+      console.log('💡 If data is not saving, run: npm run debug');
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
 }
 
 startServer().catch(console.error);
