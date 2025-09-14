@@ -37,19 +37,519 @@
         "amount": 75520,
         "paymentMethod": "העברה",
         "id": "2025-09-13T14:03:17.922Z"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "גנאל כהן",
+        "amount": 32000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-13T15:41:42.842Z"
+      },
+      {
+        "date": "2025-03-25",
+        "description": "יסמין כהן",
+        "amount": 37760,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T15:42:08.103Z"
+      },
+      {
+        "date": "2025-05-04",
+        "description": "גנאל כהן",
+        "amount": 32000,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T15:42:49.013Z"
+      },
+      {
+        "date": "2025-05-29",
+        "description": "גנאל כהן",
+        "amount": 32000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-13T15:44:07.914Z"
+      },
+      {
+        "date": "2025-06-13",
+        "description": "יסמין כהן",
+        "amount": 37760,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T15:44:36.306Z"
+      },
+      {
+        "date": "2025-06-24",
+        "description": "גנאל כהן",
+        "amount": 32000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-13T15:44:53.131Z"
+      },
+      {
+        "date": "2025-07-02",
+        "description": "גנאל כהן",
+        "amount": 15000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-13T15:45:11.696Z"
+      },
+      {
+        "date": "2025-03-09",
+        "description": "גנאל כהן",
+        "amount": 32000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-13T15:46:01.189Z"
+      },
+      {
+        "date": "2025-06-09",
+        "description": "יסמין כהן",
+        "amount": 37760,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T15:46:20.218Z"
+      },
+      {
+        "date": "2025-07-23",
+        "description": "יסמין כהן",
+        "amount": 37760,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T15:47:14.998Z"
+      },
+      {
+        "date": "2025-07-28",
+        "description": "גנאל כהן",
+        "amount": 32000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-13T15:47:38.784Z"
+      },
+      {
+        "date": "2025-07-06",
+        "description": "יסמין כהן",
+        "amount": 37760,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T15:47:55.510Z"
+      },
+      {
+        "date": "2025-07-23",
+        "description": "יסמין כהן",
+        "amount": 37760,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T15:48:15.894Z"
+      },
+      {
+        "date": "2025-08-04",
+        "description": "יסמין כהן",
+        "amount": 37760,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T15:48:32.172Z"
+      },
+      {
+        "date": "2025-08-07",
+        "description": "גנאל כהן",
+        "amount": 20000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-13T15:48:52.857Z"
+      },
+      {
+        "date": "2025-08-28",
+        "description": "גנאל כהן",
+        "amount": 10000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-13T15:49:14.162Z"
+      },
+      {
+        "date": "2025-08-29",
+        "description": "יסמין כהן",
+        "amount": 37760,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T15:49:44.906Z"
+      },
+      {
+        "date": "2025-08-21",
+        "description": "יסמין כהן",
+        "amount": 37760,
+        "paymentMethod": "העברה",
+        "id": "2025-09-13T15:50:16.850Z"
       }
     ],
     "expenses": [
       {
-        "category": "קבלני משנה",
+        "category": "חומרי בנייה",
+        "date": "2025-02-20",
+        "supplier": "רוזנברג ובניו בע\"מ",
+        "supplierId": "2025-09-13T15:53:00.336Z",
+        "description": "חומרי בניין",
+        "amount": 114.41,
+        "hasVat": true,
+        "amountWithVat": 135,
+        "id": "2025-09-13T16:07:36.792Z"
+      },
+      {
+        "category": "חומרי בנייה",
+        "date": "2025-03-04",
+        "supplier": "סבן יעקב ציוד לבניין",
+        "supplierId": "2025-09-13T15:53:19.896Z",
+        "description": "חומרי בניין",
+        "amount": 5900,
+        "hasVat": true,
+        "amountWithVat": 6962,
+        "id": "2025-09-13T16:08:06.788Z"
+      },
+      {
+        "category": "חומרי בנייה",
         "date": "2025-09-13",
+        "supplier": "רפי את רפי",
+        "supplierId": "2025-09-13T15:53:28.516Z",
+        "description": "חומרי בניין",
+        "amount": 334.75,
+        "hasVat": true,
+        "amountWithVat": 395,
+        "id": "2025-09-13T16:08:29.149Z"
+      },
+      {
+        "category": "חומרי בנייה",
+        "date": "2025-05-28",
+        "supplier": "סיני סטור",
+        "supplierId": "2025-09-13T15:53:37.259Z",
+        "description": "חומרי בניין",
+        "amount": 7968.64,
+        "hasVat": true,
+        "amountWithVat": 9403,
+        "id": "2025-09-13T16:09:02.719Z"
+      },
+      {
+        "category": "חומרי בנייה",
+        "date": "2025-07-15",
+        "supplier": "מוטימקס חומרי בניין",
+        "supplierId": "2025-09-13T15:53:49.019Z",
+        "description": "חומרי בניין",
+        "amount": 76.19,
+        "hasVat": true,
+        "amountWithVat": 89.9,
+        "id": "2025-09-13T16:09:31.045Z"
+      },
+      {
+        "category": "חומרי בנייה",
+        "date": "2025-07-23",
+        "supplier": "מוטימקס חומרי בניין",
+        "supplierId": "2025-09-13T15:53:49.019Z",
+        "description": "חומרי בניין",
+        "amount": 199.91,
+        "hasVat": true,
+        "amountWithVat": 235.89,
+        "id": "2025-09-13T16:09:55.554Z"
+      },
+      {
+        "category": "חומרי בנייה",
+        "date": "2025-07-24",
+        "supplier": "3בלוק",
+        "supplierId": "2025-09-13T15:53:57.104Z",
+        "description": "חומרי בניין",
+        "amount": 2977.12,
+        "hasVat": true,
+        "amountWithVat": 3513,
+        "id": "2025-09-13T16:10:27.822Z"
+      },
+      {
+        "category": "חומרי בנייה",
+        "date": "2025-07-29",
+        "supplier": "בי טק מוצרי בניה מתקדמים",
+        "supplierId": "2025-09-13T15:54:09.697Z",
+        "description": "חומרי בניין",
+        "amount": 1495.76,
+        "hasVat": true,
+        "amountWithVat": 1765,
+        "id": "2025-09-13T16:10:54.267Z"
+      },
+      {
+        "category": "חומרי בנייה",
+        "date": "2025-08-20",
+        "supplier": "הום סנטר",
+        "supplierId": "2025-09-13T15:54:17.999Z",
+        "description": "חומרי בניין",
+        "amount": 54.07,
+        "hasVat": true,
+        "amountWithVat": 63.8,
+        "id": "2025-09-13T16:11:24.079Z"
+      },
+      {
+        "category": "חומרי בנייה",
+        "date": "2025-08-24",
+        "supplier": "מוטימקס חומרי בניין",
+        "supplierId": "2025-09-13T15:53:49.019Z",
+        "description": "חומרי בניין",
+        "amount": 641.36,
+        "hasVat": true,
+        "amountWithVat": 756.8,
+        "id": "2025-09-13T16:11:54.296Z"
+      },
+      {
+        "category": "חומרי בנייה",
+        "date": "2025-08-24",
+        "supplier": "רפי את רפי",
+        "supplierId": "2025-09-13T15:53:28.516Z",
+        "description": "חומרי בניין",
+        "amount": 250,
+        "hasVat": true,
+        "amountWithVat": 295,
+        "id": "2025-09-13T16:12:21.504Z"
+      },
+      {
+        "category": "חשמל",
+        "date": "2025-03-24",
+        "supplier": "בן יעקובוב",
+        "supplierId": "2025-09-13T15:52:34.745Z",
+        "description": "חשמל",
+        "amount": 10000,
+        "hasVat": true,
+        "amountWithVat": 11800,
+        "id": "2025-09-13T16:12:53.247Z"
+      },
+      {
+        "category": "חשמל",
+        "date": "2025-03-27",
+        "supplier": "בן יעקובוב",
+        "supplierId": "2025-09-13T15:52:34.745Z",
+        "description": "חשמל",
+        "amount": 5000,
+        "hasVat": true,
+        "amountWithVat": 5900,
+        "id": "2025-09-13T16:13:38.223Z"
+      },
+      {
+        "category": "חשמל",
+        "date": "2025-07-17",
+        "supplier": "בן יעקובוב",
+        "supplierId": "2025-09-13T15:52:34.745Z",
+        "description": "חשמל",
+        "amount": 10000,
+        "hasVat": true,
+        "amountWithVat": 11800,
+        "id": "2025-09-13T16:14:03.148Z"
+      },
+      {
+        "category": "חשמל",
+        "date": "2025-08-22",
+        "supplier": "בן יעקובוב",
+        "supplierId": "2025-09-13T15:52:34.745Z",
+        "description": "חשמל",
+        "amount": 10000,
+        "hasVat": true,
+        "amountWithVat": 11800,
+        "id": "2025-09-13T16:14:41.520Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-03-05",
+        "supplier": "ע.ע עבודות אלומיניום",
+        "supplierId": "2025-09-13T15:55:59.008Z",
+        "description": "אלומיניום",
+        "amount": 10000,
+        "hasVat": true,
+        "amountWithVat": 11800,
+        "id": "2025-09-13T16:15:31.039Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-03-10",
+        "supplier": "איירונובה בע\"מ",
+        "supplierId": "2025-09-13T15:58:31.521Z",
+        "description": "תואם",
+        "amount": 7800,
+        "hasVat": true,
+        "amountWithVat": 9204,
+        "id": "2025-09-13T16:15:59.396Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-03-19",
+        "supplier": "ע.ע עבודות אלומיניום",
+        "supplierId": "2025-09-13T15:55:59.008Z",
+        "description": "אלומיניום",
+        "amount": 10000,
+        "hasVat": true,
+        "amountWithVat": 11800,
+        "id": "2025-09-13T16:16:26.876Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-04-09",
+        "supplier": "ע.ע עבודות אלומיניום",
+        "supplierId": "2025-09-13T15:55:59.008Z",
+        "description": "אלומיניום",
+        "amount": 20000,
+        "hasVat": true,
+        "amountWithVat": 23600,
+        "id": "2025-09-13T16:17:00.384Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-04-10",
+        "supplier": "מ.ע.ש פרויקטים ובניה",
+        "supplierId": "2025-09-13T13:53:53.338Z",
+        "description": "ריצוף וצבע",
+        "amount": 9700,
+        "hasVat": true,
+        "amountWithVat": 11446,
+        "id": "2025-09-13T16:17:39.336Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-04-23",
+        "supplier": "ע.ע עבודות אלומיניום",
+        "supplierId": "2025-09-13T15:55:59.008Z",
+        "description": "אלומיניום",
+        "amount": 5000,
+        "hasVat": true,
+        "amountWithVat": 5900,
+        "id": "2025-09-13T16:18:03.789Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-04-23",
         "supplier": "מ.ע.ש פרויקטים ובניה",
         "supplierId": "2025-09-13T13:53:53.338Z",
         "description": "ריצוף וצבע",
         "amount": 5000,
         "hasVat": true,
         "amountWithVat": 5900,
-        "id": "2025-09-13T13:55:44.890Z"
+        "id": "2025-09-13T16:19:04.982Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-04-28",
+        "supplier": "מ.ע.ש פרויקטים ובניה",
+        "supplierId": "2025-09-13T13:53:53.338Z",
+        "description": "ריצוף וצבע",
+        "amount": 5000,
+        "hasVat": true,
+        "amountWithVat": 5900,
+        "id": "2025-09-13T16:20:26.772Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-05-08",
+        "supplier": "מ.ע.ש פרויקטים ובניה",
+        "supplierId": "2025-09-13T13:53:53.338Z",
+        "description": "הוספה ידנית מעדכון של גיא",
+        "amount": 56200,
+        "hasVat": true,
+        "amountWithVat": 66316,
+        "id": "2025-09-13T16:21:10.813Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-06-22",
+        "supplier": "דגמי שרותי גז",
+        "supplierId": "2025-09-13T16:00:16.815Z",
+        "description": "עבודות צנרת",
+        "amount": 1271.19,
+        "hasVat": true,
+        "amountWithVat": 1500,
+        "id": "2025-09-13T16:21:53.104Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-06-24",
+        "supplier": "אבי אייר",
+        "supplierId": "2025-09-13T16:00:47.038Z",
+        "description": "מיזוג אוויר",
+        "amount": 720.34,
+        "hasVat": true,
+        "amountWithVat": 850,
+        "id": "2025-09-13T16:22:22.468Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-07-03",
+        "supplier": "איזי פרדו",
+        "supplierId": "2025-09-13T16:02:24.888Z",
+        "description": "אבן ושיש",
+        "amount": 1300,
+        "hasVat": true,
+        "amountWithVat": 1534,
+        "id": "2025-09-13T16:22:51.871Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-07-09",
+        "supplier": "מ.ע.ש פרויקטים ובניה",
+        "supplierId": "2025-09-13T13:53:53.338Z",
+        "description": "עדכון גיא",
+        "amount": 68100,
+        "hasVat": true,
+        "amountWithVat": 80358,
+        "id": "2025-09-13T16:23:28.101Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-07-16",
+        "supplier": "מ.ע.ש פרויקטים ובניה",
+        "supplierId": "2025-09-13T13:53:53.338Z",
+        "description": "ריצוף וצבע",
+        "amount": 21000,
+        "hasVat": true,
+        "amountWithVat": 24780,
+        "id": "2025-09-13T16:24:01.416Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-07-16",
+        "supplier": "איטום חלבי סאם",
+        "supplierId": "2025-09-13T16:04:09.595Z",
+        "description": "איטום",
+        "amount": 4000,
+        "hasVat": true,
+        "amountWithVat": 4720,
+        "id": "2025-09-13T16:26:12.172Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-07-23",
+        "supplier": "מ.ע.ש פרויקטים ובניה",
+        "supplierId": "2025-09-13T13:53:53.338Z",
+        "description": "ריצוף וצבע",
+        "amount": 20000,
+        "hasVat": true,
+        "amountWithVat": 23600,
+        "id": "2025-09-13T16:26:40.536Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-07-30",
+        "supplier": "מ.ע.ש פרויקטים ובניה",
+        "supplierId": "2025-09-13T13:53:53.338Z",
+        "description": "ריצוף וצבע",
+        "amount": 20000,
+        "hasVat": true,
+        "amountWithVat": 23600,
+        "id": "2025-09-13T16:26:59.999Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-08-07",
+        "supplier": "א.מ. הנדסת שיקום",
+        "supplierId": "2025-09-13T16:05:06.732Z",
+        "description": "יצקות",
+        "amount": 3000,
+        "hasVat": true,
+        "amountWithVat": 3540,
+        "id": "2025-09-13T16:27:29.525Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-08-06",
+        "supplier": "מ.ע.ש פרויקטים ובניה",
+        "supplierId": "2025-09-13T13:53:53.338Z",
+        "description": "ריצוף וצבע",
+        "amount": 5000,
+        "hasVat": true,
+        "amountWithVat": 5900,
+        "id": "2025-09-13T16:27:51.395Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-08-20",
+        "supplier": "מ.ע.ש פרויקטים ובניה",
+        "supplierId": "2025-09-13T13:53:53.338Z",
+        "description": "ריצוף וצבע",
+        "amount": 5000,
+        "hasVat": true,
+        "amountWithVat": 5900,
+        "id": "2025-09-13T16:28:12.469Z"
       }
     ],
     "isArchived": false

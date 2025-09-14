@@ -40,7 +40,11 @@ const ExportExcelModal: React.FC<ExportExcelModalProps> = ({ project, summaryDat
   return (
     <Modal isOpen={isOpen} title="בחר סוג דוח לייצוא" onClose={onClose}>
       <div className="space-y-4 text-center">
-        <p className="text-gray-600">בחר את רמת הפירוט הרצויה עבור דוח האקסל שלך.</p>
+        <p className="text-gray-600">בחר את רמת הפירוט הרצויה עבור דוח האקסל שלך:</p>
+        <div className="text-sm text-gray-500 space-y-2">
+          <p><strong>דוח מקוצר:</strong> פירוט ספקים בלבד</p>
+          <p><strong>דוח מלא:</strong> פירוט ספקים + פירוט מלא של הכנסות (תאריכים, אחוזים ומעקב מצטבר)</p>
+        </div>
         <div className="flex flex-col md:flex-row justify-center gap-4 pt-4">
           <button 
             type="button" 

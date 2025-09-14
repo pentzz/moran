@@ -835,7 +835,7 @@ const createHTMLExcelContent = (project: Project, summaryData: any, categories: 
   content += '<body>\n';
 
   // Add main summary content
-  content += createHTMLSummarySection(project, summaryData, categories, recipientName, suppliers);
+  content += createHTMLSummarySection(project, summaryData, categories, recipientName, suppliers, options.includeIncomes);
 
   content += '</body>\n';
   content += '</html>';
@@ -844,7 +844,7 @@ const createHTMLExcelContent = (project: Project, summaryData: any, categories: 
 };
 
 // Create HTML summary section
-const createHTMLSummarySection = (project: Project, summaryData: any, categories: Category[], recipientName: string, suppliers?: any[]): string => {
+const createHTMLSummarySection = (project: Project, summaryData: any, categories: Category[], recipientName: string, suppliers?: any[], includeIncomeDetails?: boolean): string => {
   let html = '';
 
   // Company header
@@ -1066,6 +1066,45 @@ const createHTMLSummarySection = (project: Project, summaryData: any, categories
     html += '<td colspan="2" style="text-align: center; font-weight: bold;">🧾 סה"כ מע"מ (18%)</td>\n';
     html += '<td colspan="2" class="currency" style="background-color: #FEF3C7; color: #D97706; font-weight: bold;">';
     html += `${formatCurrency(vatDifference)}</td>\n`;
+    html += '</tr>\n';
+    
+    html += '</table>\n';
+  }
+
+  // Income details section (only for full report)
+  if (includeIncomeDetails && project.incomes && project.incomes.length > 0) {
+    html += '<br><br>\n';
+    html += '<table>\n';
+    html += '<tr><td colspan="6" class="section-title">💰 פירוט הכנסות מלא</td></tr>\n';
+    html += '<tr class="header">\n';
+    html += '<th>📅 תאריך הכנסה</th><th>📝 תיאור הכנסה</th><th>💵 סכום (₪)</th><th>📊 אחוז מחוזה</th><th>🔄 סטטוס</th><th>📋 הערות</th>\n';
+    html += '</tr>\n';
+
+    let cumulativeIncome = 0;
+    project.incomes.forEach((income, index) => {
+      const isAlternating = index % 2 === 1;
+      const rowClass = isAlternating ? 'alternating' : '';
+      cumulativeIncome += income.amount;
+      const percentOfContract = summaryData.contractAmount > 0 ? ((income.amount / summaryData.contractAmount) * 100).toFixed(1) : '0.0';
+      const cumulativePercent = summaryData.contractAmount > 0 ? ((cumulativeIncome / summaryData.contractAmount) * 100).toFixed(1) : '0.0';
+      
+      html += `<tr class="${rowClass}">\n`;
+      html += `<td style="text-align: center;">${new Date(income.date).toLocaleDateString('he-IL')}</td>\n`;
+      html += `<td>${income.description}</td>\n`;
+      html += `<td class="currency">${formatCurrency(income.amount)}</td>\n`;
+      html += `<td style="text-align: center;">${percentOfContract}%</td>\n`;
+      html += `<td class="status-good" style="text-align: center;">✅ אושר</td>\n`;
+      html += `<td style="font-size: 11px; color: #6B7280;">מצטבר: ${formatCurrency(cumulativeIncome)} (${cumulativePercent}%)</td>\n`;
+      html += '</tr>\n';
+    });
+
+    // Income summary row
+    html += '<tr class="header">\n';
+    html += '<td colspan="2" style="font-weight: bold;">🎯 סיכום כולל הכנסות</td>\n';
+    html += `<td class="currency" style="font-weight: bold;">${formatCurrency(summaryData.totalIncomes)}</td>\n`;
+    html += `<td style="text-align: center; font-weight: bold;">${summaryData.contractAmount > 0 ? ((summaryData.totalIncomes / summaryData.contractAmount) * 100).toFixed(1) : '0.0'}%</td>\n`;
+    html += `<td style="text-align: center; font-weight: bold;">${summaryData.totalIncomes >= summaryData.contractAmount ? '🟢 הושלם' : '🟡 בתהליך'}</td>\n`;
+    html += `<td style="font-weight: bold;">${project.incomes.length} תשלומים</td>\n`;
     html += '</tr>\n';
     
     html += '</table>\n';
