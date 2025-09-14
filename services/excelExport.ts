@@ -732,11 +732,17 @@ const createHTMLExcelContent = (project: Project, summaryData: any, categories: 
   content += '<meta charset="UTF-8">\n';
   content += '<style>\n';
   content += `
+    @page { 
+      size: A4; 
+      margin: 2cm; 
+    }
     body { 
       direction: rtl; 
       font-family: 'Segoe UI', Arial, sans-serif; 
       margin: 0; 
       padding: 20px; 
+      width: 210mm;
+      max-width: 794px;
     }
     table { 
       border-collapse: collapse; 
