@@ -553,5 +553,85 @@
       }
     ],
     "isArchived": false
+  },
+  {
+    "name": "מורן מרקוביץ'",
+    "description": "",
+    "contractAmount": 550000,
+    "id": "2025-09-16T09:19:47.615Z",
+    "incomes": [
+      {
+        "date": "2025-09-16",
+        "description": "אבן דרך ראשונה- הריסה ואינסטלציה",
+        "amount": 150000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-16T09:30:38.476Z"
+      },
+      {
+        "date": "2025-09-16",
+        "description": "אבן דרך שניה- שני ושלישי גמר חשבון",
+        "amount": 400000,
+        "paymentMethod": "מזומן",
+        "id": "2025-09-16T09:43:40.320Z"
+      }
+    ],
+    "expenses": [
+      {
+        "category": "חומרי בנייה",
+        "date": "2025-09-16",
+        "supplier": "רוזנברג ובניו בע\"מ",
+        "supplierId": "2025-09-13T15:53:00.336Z",
+        "description": "חומרי בניין",
+        "amount": 8474.58,
+        "hasVat": true,
+        "amountWithVat": 10000,
+        "id": "2025-09-16T09:39:43.244Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-09-16",
+        "supplier": "רפי את רפי",
+        "supplierId": "2025-09-13T15:53:28.516Z",
+        "description": "חשמל",
+        "amount": 30000,
+        "hasVat": true,
+        "amountWithVat": 35400,
+        "id": "2025-09-16T09:40:04.241Z"
+      },
+      {
+        "category": "חשמל",
+        "date": "2025-09-16",
+        "supplier": "איזי פרדו",
+        "supplierId": "2025-09-13T16:02:24.888Z",
+        "description": "חשמל",
+        "amount": 50000,
+        "hasVat": true,
+        "amountWithVat": 59000,
+        "id": "2025-09-16T09:40:25.777Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-09-16",
+        "supplier": "ע.ע עבודות אלומיניום",
+        "supplierId": "2025-09-13T15:55:59.008Z",
+        "description": "אלומיניום",
+        "amount": 150000,
+        "hasVat": true,
+        "amountWithVat": 177000,
+        "id": "2025-09-16T09:41:51.892Z"
+      },
+      {
+        "category": "קבלני משנה",
+        "date": "2025-09-16",
+        "supplier": "אבי אייר",
+        "supplierId": "2025-09-13T16:00:47.038Z",
+        "description": "גמר",
+        "amount": 200000,
+        "hasVat": true,
+        "amountWithVat": 236000,
+        "id": "2025-09-16T09:42:29.823Z"
+      }
+    ],
+    "isArchived": false
   }
 ]
