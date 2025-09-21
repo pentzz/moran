@@ -12,8 +12,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.static('dist')); // Serve built files
 app.use(express.static(__dirname)); // Serve logo and other static files from root
 
-// Data directory
-const DATA_DIR = path.join(__dirname, 'data');
+// Data directory - check if running from dist or development
+const DATA_DIR = fs.existsSync(path.join(__dirname, 'dist', 'data'))
+  ? path.join(__dirname, 'dist', 'data')  // Production: data in dist folder
+  : path.join(__dirname, 'public', 'data'); // Development: data in public folder
 const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json');
 const CATEGORIES_FILE = path.join(DATA_DIR, 'categories.json');
 const SUPPLIERS_FILE = path.join(DATA_DIR, 'suppliers.json');

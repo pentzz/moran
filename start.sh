@@ -29,16 +29,16 @@ echo "🔨 בונה את הפרוייקט..."
 npm run build
 
 # יצירת תיקיית נתונים אם לא קיימת
-if [ ! -d "data" ]; then
+if [ ! -d "public/data" ]; then
     echo "📁 יוצר תיקיית נתונים..."
-    mkdir data
+    mkdir -p public/data
 fi
 
 # הגדרת הרשאות לתיקיית נתונים
 echo "🔒 מגדיר הרשאות לתיקיית הנתונים..."
-chmod 755 data/
-if [ -f "data/projects.json" ]; then
-    chmod 644 data/*.json
+chmod 755 public/data/
+if [ -f "public/data/projects.json" ]; then
+    chmod 644 public/data/*.json
     echo "✅ נמצאו נתונים קיימים - ישמרו בשרת"
 fi
 

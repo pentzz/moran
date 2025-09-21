@@ -3,7 +3,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+const DATA_DIR = path.join(process.cwd(), 'public', 'data');
 const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json');
 
 async function debugServerData() {
@@ -51,7 +51,7 @@ async function debugServerData() {
       console.log('✅ יש הרשאות כתיבה לקובץ projects.json');
     } catch {
       console.error('❌ אין הרשאות כתיבה לקובץ projects.json!');
-      console.log('💡 פתרון: הרץ chmod 644 data/projects.json');
+      console.log('💡 פתרון: הרץ chmod 644 public/data/projects.json');
     }
     
   } catch (error) {

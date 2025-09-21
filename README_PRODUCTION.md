@@ -17,7 +17,7 @@ npm run build
 - `dist/` - קבצי הפרונטאנד הבנויים
 - `server.js` - השרת
 - `package.json` - התלויות
-- `data/` - **תיקיית הנתונים הקיימים (חשוב מאוד!)**
+- `public/data/` - **תיקיית הנתונים הקיימים (חשוב מאוד!)**
   - `projects.json` - כל הפרויקטים שלך
   - `categories.json` - הקטגוריות שיצרת
   - `suppliers.json` - רשימת הספקים
@@ -37,8 +37,8 @@ npm start
 ודא שלשרת יש הרשאות כתיבה לתיקיית data:
 ```bash
 # Linux/Mac
-chmod 755 data/
-chmod 644 data/*.json
+chmod 755 public/data/
+chmod 644 public/data/*.json
 
 # או אם צריך יותר הרשאות:
 chmod 777 data/
@@ -56,8 +56,8 @@ npm run debug
 
 #### 1. אין הרשאות לתיקייה
 ```bash
-chmod 755 data/
-chmod 644 data/*.json
+chmod 755 public/data/
+chmod 644 public/data/*.json
 ```
 
 #### 2. תיקיית data לא קיימת
@@ -67,10 +67,10 @@ mkdir data
 
 #### 3. הקבצים לא הועלו
 ודא שהועלו:
-- data/projects.json
-- data/categories.json  
-- data/suppliers.json
-- data/.gitkeep
+- public/data/projects.json
+- public/data/categories.json  
+- public/data/suppliers.json
+- public/data/.gitkeep
 
 #### 4. בעיות כלליות
 - ודא שהפורט 3001 פנוי
@@ -134,14 +134,14 @@ location / {
 ## נתוני ברירת מחדל
 - **שם משתמש:** litalb
 - **סיסמה:** Papi2009
-- **נתונים נשמרים ב:** `data/` directory
+- **נתונים נשמרים ב:** `public/data/` directory
 
 ## תחזוקה
-- גיבוי קבצי JSON מתיקיית `data/`
+- גיבוי קבצי JSON מתיקיית `public/data/`
 - לוגים נשמרים ב-console
 - הפעלה מחדש: `npm restart` או systemctl restart
 
 ## פתרון בעיות
 1. ודא שפורט 3001 פנוי
-2. ודא שיש הרשאות קריאה/כתיבה לתיקיית `data/`
+2. ודא שיש הרשאות קריאה/כתיבה לתיקיית `public/data/`
 3. בדוק לוגים עם `npm run server` (ללא background)
