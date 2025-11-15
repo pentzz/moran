@@ -2,15 +2,61 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const cors = require('cors');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const compression = require('compression');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable for now to allow inline scripts
+  crossOriginEmbedderPolicy: false
+}));
+app.use(compression());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  message: 'יותר מדי בקשות מכתובת IP זו, נסה שוב מאוחר יותר'
+});
+app.use('/api/', limiter);
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || '*',
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
+// Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static('dist')); // Serve built files
-app.use(express.static(__dirname)); // Serve logo and other static files from root
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Session configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'default-secret-change-me',
+  name: process.env.SESSION_NAME || 'moran_session',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    httpOnly: true, // Prevent XSS
+    maxAge: parseInt(process.env.SESSION_MAX_AGE) || 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax'
+  }
+}));
+
+// Serve built files
+app.use(express.static('dist'));
+app.use(express.static(__dirname));
 
 // Data directory - שמירת נתונים רב-שכבתית עם גיבוי
 const PRODUCTION_DATA_DIR = path.join(__dirname, 'data');
@@ -44,8 +90,9 @@ async function determineDataDirectory() {
 
 // נתיבי הקבצים יעודכנו ב-startServer
 let PROJECTS_FILE;
-let CATEGORIES_FILE; 
+let CATEGORIES_FILE;
 let SUPPLIERS_FILE;
+let USERS_FILE;
 
 // Ensure data directory exists
 async function ensureDataDir() {
@@ -200,22 +247,79 @@ async function syncDataToOtherDirectories(originalFile, data) {
   }
 }
 
-// Authentication endpoint
-app.post('/api/auth/login', (req, res) => {
-  const { username, password } = req.body;
-  
-  // Simple authentication - in production, use proper hashing and database
-  if (username === 'litalb' && password === 'Papi2009') {
-    res.json({ 
-      success: true, 
-      token: 'authenticated',
-      user: { username }
+// Authentication middleware
+const requireAuth = (req, res, next) => {
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ error: 'נדרש אימות', authenticated: false });
+  }
+  next();
+};
+
+// Authentication endpoints
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Load users from JSON file
+    const users = await readJsonFile(USERS_FILE);
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (user) {
+      // Create session
+      req.session.userId = user.id;
+      req.session.username = user.username;
+      req.session.role = user.role;
+
+      // Update last login
+      const userIndex = users.findIndex(u => u.id === user.id);
+      users[userIndex].lastLogin = new Date().toISOString();
+      await writeJsonFile(USERS_FILE, users);
+
+      // Return user data (without password)
+      const { password: _, ...userWithoutPassword } = user;
+
+      res.json({
+        success: true,
+        user: userWithoutPassword,
+        authenticated: true
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: 'שם משתמש או סיסמה שגויים',
+        authenticated: false
+      });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'שגיאה בתהליך ההתחברות',
+      authenticated: false
+    });
+  }
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'שגיאה בהתנתקות' });
+    }
+    res.clearCookie(process.env.SESSION_NAME || 'moran_session');
+    res.json({ success: true, message: 'התנתקת בהצלחה' });
+  });
+});
+
+app.get('/api/auth/check', (req, res) => {
+  if (req.session && req.session.userId) {
+    res.json({
+      authenticated: true,
+      userId: req.session.userId,
+      username: req.session.username,
+      role: req.session.role
     });
   } else {
-    res.status(401).json({ 
-      success: false, 
-      message: 'שם משתמש או סיסמה שגויים' 
-    });
+    res.json({ authenticated: false });
   }
 });
 
@@ -599,6 +703,7 @@ async function startServer() {
     PROJECTS_FILE = path.join(DATA_DIR, 'projects.json');
     CATEGORIES_FILE = path.join(DATA_DIR, 'categories.json');
     SUPPLIERS_FILE = path.join(DATA_DIR, 'suppliers.json');
+    USERS_FILE = path.join(DATA_DIR, 'users.json');
     
     // בדיקת הרשאות לתיקיית עבודה
     try {

@@ -20,62 +20,44 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [originalUser, setOriginalUser] = useState<User | null>(null);
   const [isImpersonating, setIsImpersonating] = useState(false);
 
+  // Check session on app load
   useEffect(() => {
-    // Check if user is already authenticated on app load
-    const storedToken = localStorage.getItem('authToken');
-    const storedUser = localStorage.getItem('currentUser');
-    
-    if (storedToken && storedUser) {
+    const checkSession = async () => {
       try {
-        setAuthToken(storedToken);
-        setUser(JSON.parse(storedUser));
+        const response = await serverAuthApi.checkAuth();
+        if (response.authenticated && response.userId) {
+          // Fetch full user data
+          const users = await import('../services/serverApi').then(m => m.usersApi.getAll());
+          const currentUser = users.find(u => u.id === response.userId);
+          if (currentUser) {
+            setUser(currentUser);
+          }
+        }
       } catch (error) {
-        console.error('Error parsing stored auth data:', error);
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
+        console.log('No active session or session check failed');
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    checkSession();
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // Try server authentication first (api.php)
-      try {
-        const response = await serverAuthApi.login(username, password);
-        
-        if (response.success) {
-          setAuthToken(response.token);
-          setUser(response.user);
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
-          localStorage.setItem('authToken', response.token);
-          return true;
-        }
-      } catch (serverError) {
-        console.log('Server API failed, trying local fallback:', serverError);
-        
-        // Fallback to local authentication (reads from users.json)
-        try {
-          const localResponse = await localAuthApi.login(username, password);
-          
-          if (localResponse.success) {
-            setAuthToken(localResponse.token);
-            setUser(localResponse.user);
-            localStorage.setItem('currentUser', JSON.stringify(localResponse.user));
-            localStorage.setItem('authToken', localResponse.token);
-            return true;
-          }
-        } catch (localError) {
-          console.error('Local authentication also failed:', localError);
-        }
+      const response = await serverAuthApi.login(username, password);
+
+      if (response.success && response.authenticated) {
+        setUser(response.user);
+        return true;
       }
-      
+
       return false;
     } catch (error) {
       console.error('Login failed:', error);
@@ -85,14 +67,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const logout = () => {
-    setAuthToken(null);
-    setUser(null);
-    setOriginalUser(null);
-    setIsImpersonating(false);
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('originalUser');
-    localStorage.removeItem('authToken');
+  const logout = async () => {
+    try {
+      await serverAuthApi.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      setOriginalUser(null);
+      setIsImpersonating(false);
+    }
   };
 
   const impersonateUser = (targetUser: User) => {
@@ -100,8 +84,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setOriginalUser(user);
       setUser(targetUser);
       setIsImpersonating(true);
-      localStorage.setItem('originalUser', JSON.stringify(user));
-      localStorage.setItem('currentUser', JSON.stringify(targetUser));
     }
   };
 
@@ -110,33 +92,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(originalUser);
       setOriginalUser(null);
       setIsImpersonating(false);
-      localStorage.setItem('currentUser', JSON.stringify(originalUser));
-      localStorage.removeItem('originalUser');
     }
   };
 
   const refreshUser = async () => {
-    if (user?.id && user?.username) {
-      try {
-        // Try server first, then local fallback
-        let response;
-        try {
-          response = await serverAuthApi.login(user.username, user.password || '');
-        } catch {
-          response = await localAuthApi.login(user.username, user.password || '');
+    try {
+      const response = await serverAuthApi.checkAuth();
+      if (response.authenticated && response.userId) {
+        const users = await import('../services/serverApi').then(m => m.usersApi.getAll());
+        const currentUser = users.find(u => u.id === response.userId);
+        if (currentUser) {
+          setUser(currentUser);
         }
-        
-        if (response.success) {
-          setUser(response.user);
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
-        }
-      } catch (error) {
-        console.error('Error refreshing user:', error);
       }
+    } catch (error) {
+      console.error('Error refreshing user:', error);
     }
   };
 
-  const isAuthenticated = authToken !== null && user !== null;
+  const isAuthenticated = user !== null;
   const isAdmin = user?.role === UserRole.Admin || user?.role === 'admin';
 
   return (

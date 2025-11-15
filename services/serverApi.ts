@@ -1,7 +1,7 @@
 import { Project, Income, Expense, Category, Subcategory, Supplier, Milestone, User, ActivityLog, SystemSettings, UserSettings, UserProfile } from '../types';
 
-// מערכת API מרכזית שעובדת עם קבצי JSON בשרת
-const API_BASE_URL = 'api.php';
+// מערכת API מרכזית שעובדת עם השרת בלבד (ללא localStorage)
+const API_BASE_URL = '/api';
 
 class ApiError extends Error {
   constructor(message: string, public status: number) {
@@ -10,78 +10,21 @@ class ApiError extends Error {
   }
 }
 
-// Helper function to load from localStorage or JSON file
-async function loadFromLocalOrFile<T>(storageKey: string, jsonFile: string, defaultValue: T): Promise<T> {
-  try {
-    // Try localStorage first
-    const stored = localStorage.getItem(storageKey);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        // Accept empty arrays/objects as valid data
-        if (parsed !== null && parsed !== undefined) {
-          console.log(`✅ Loaded ${storageKey} from localStorage`);
-          return parsed;
-        }
-      } catch (e) {
-        // Invalid JSON in localStorage, clear it
-        localStorage.removeItem(storageKey);
-      }
-    }
-    
-    // Try JSON file
-    try {
-      const response = await fetch(`/data/${jsonFile}`);
-      if (response.ok) {
-        const text = await response.text();
-        // Check if response is HTML (error page) instead of JSON
-        if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
-          console.log(`⚠️ Server returned HTML for ${jsonFile}, using default`);
-          return defaultValue;
-        }
-        try {
-          const data = JSON.parse(text);
-          // Accept empty arrays/objects as valid data
-          if (data !== null && data !== undefined) {
-            console.log(`✅ Loaded ${jsonFile} from file`);
-            localStorage.setItem(storageKey, JSON.stringify(data));
-            return data;
-          }
-        } catch (e) {
-          console.log(`⚠️ Invalid JSON in ${jsonFile}, using default`);
-        }
-      } else if (response.status === 404) {
-        // File doesn't exist - that's OK, use default
-        console.log(`⚠️ File ${jsonFile} not found, using default`);
-      }
-    } catch (fetchError) {
-      // Network error or other fetch error - that's OK, use default
-      console.log(`⚠️ Could not load ${jsonFile}, using default`);
-    }
-    
-    console.log(`⚠️ No data found, using default for ${storageKey}`);
-    return defaultValue;
-  } catch (error) {
-    // Any other error - use default silently
-    console.log(`⚠️ Error loading ${storageKey}, using default`);
-    return defaultValue;
-  }
-}
+async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
 
-async function apiRequest<T>(action: string, options: RequestInit = {}): Promise<T> {
-  const url = `${API_BASE_URL}?action=${action}`;
-  
   const config: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
     },
+    credentials: 'include', // Important: Include cookies for session
     ...options,
   };
 
   try {
     const response = await fetch(url, config);
-    
+
     if (!response.ok) {
       let errorMessage = 'Network error';
       try {
@@ -92,22 +35,21 @@ async function apiRequest<T>(action: string, options: RequestInit = {}): Promise
       }
       throw new ApiError(errorMessage, response.status);
     }
-    
+
     const text = await response.text();
-    
+
     // Check if response is HTML (error page) instead of JSON
     if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
       throw new ApiError('Server returned HTML instead of JSON', response.status);
     }
-    
+
     return text ? JSON.parse(text) : ({} as T);
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
     }
-    
-    // Network or other errors - will be handled by fallback in each API function
-    console.warn('API request failed, will use fallback:', error);
+
+    console.error('API request failed:', error);
     throw error;
   }
 }
@@ -115,9 +57,21 @@ async function apiRequest<T>(action: string, options: RequestInit = {}): Promise
 // Authentication API
 export const authApi = {
   login: async (username: string, password: string) => {
-    return await apiRequest<{success: boolean, token: string, user: User}>('login', {
+    return await apiRequest<{success: boolean, user: User, authenticated: boolean}>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username, password }),
+    });
+  },
+
+  logout: async () => {
+    return await apiRequest<{success: boolean}>('/auth/logout', {
+      method: 'POST',
+    });
+  },
+
+  checkAuth: async () => {
+    return await apiRequest<{authenticated: boolean, userId?: string, username?: string, role?: string}>('/auth/check', {
+      method: 'GET',
     });
   },
 };
@@ -125,30 +79,25 @@ export const authApi = {
 // Users API
 export const usersApi = {
   getAll: async (): Promise<User[]> => {
-    try {
-      return await apiRequest<User[]>('getUsers');
-    } catch (error) {
-      console.log('⚠️ Server API unavailable, using local fallback for users');
-      return await loadFromLocalOrFile<User[]>('users_data', '/data/users.json', []);
-    }
+    return await apiRequest<User[]>('/users', { method: 'GET' });
   },
 
   create: async (userData: Omit<User, 'id' | 'createdAt' | 'lastLogin' | 'isActive'>): Promise<User> => {
-    return await apiRequest<User>('createUser', {
+    return await apiRequest<User>('/users', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
   },
 
   update: async (userId: string, userData: Partial<User>): Promise<void> => {
-    await apiRequest<{success: boolean}>(`updateUser&id=${userId}`, {
+    await apiRequest<{success: boolean}>(`/users/${userId}`, {
       method: 'PUT',
       body: JSON.stringify(userData),
     });
   },
 
   delete: async (userId: string): Promise<void> => {
-    await apiRequest<{success: boolean}>(`deleteUser&id=${userId}`, {
+    await apiRequest<{success: boolean}>(`/users/${userId}`, {
       method: 'DELETE',
     });
   },
@@ -171,23 +120,11 @@ export const activityApi = {
 // Settings API
 export const settingsApi = {
   get: async (): Promise<SystemSettings> => {
-    try {
-      return await apiRequest<SystemSettings>('getSettings');
-    } catch (error) {
-      console.log('⚠️ Server API unavailable, using local fallback for settings');
-      const defaultSettings: SystemSettings = {
-        id: 'default',
-        taxRate: 0,
-        vatRate: 18,
-        updatedAt: new Date().toISOString(),
-        updatedBy: 'system',
-      };
-      return await loadFromLocalOrFile<SystemSettings>('settings_data', '/data/settings.json', defaultSettings);
-    }
+    return await apiRequest<SystemSettings>('/settings', { method: 'GET' });
   },
 
   update: async (settings: Partial<SystemSettings>): Promise<SystemSettings> => {
-    return await apiRequest<SystemSettings>('updateSettings', {
+    return await apiRequest<SystemSettings>('/settings', {
       method: 'PUT',
       body: JSON.stringify(settings),
     });
@@ -197,11 +134,11 @@ export const settingsApi = {
 // User Settings API
 export const userSettingsApi = {
   get: async (userId: string): Promise<UserSettings> => {
-    return await apiRequest<UserSettings>(`getUserSettings&userId=${userId}`);
+    return await apiRequest<UserSettings>(`/users/${userId}/settings`, { method: 'GET' });
   },
 
   update: async (userId: string, settings: Partial<UserSettings>): Promise<{ success: boolean }> => {
-    return await apiRequest<{ success: boolean }>(`updateUserSettings&userId=${userId}`, {
+    return await apiRequest<{ success: boolean }>(`/users/${userId}/settings`, {
       method: 'PUT',
       body: JSON.stringify(settings),
     });
@@ -210,41 +147,11 @@ export const userSettingsApi = {
 
 export const userProfileApi = {
   get: async (userId: string): Promise<UserProfile> => {
-    try {
-      return await apiRequest<UserProfile>(`getUserProfile&userId=${userId}`);
-    } catch (error) {
-      console.log('⚠️ Server API unavailable, using local fallback for user profile');
-      // Try to get user from users list
-      const users = await usersApi.getAll();
-      const user = users.find(u => u.id === userId);
-      if (user) {
-        // Convert User to UserProfile format
-        const defaultProfile: UserProfile = {
-          id: `profile_${userId}`,
-          userId: userId,
-          fullName: user.fullName || user.username,
-          email: user.email,
-          phone: user.phone,
-          address: user.address,
-          bio: user.bio,
-          preferences: {
-            theme: 'light',
-            language: 'he',
-            notifications: true,
-            emailNotifications: false,
-          },
-          updatedAt: user.updatedAt || user.createdAt,
-          updatedBy: userId,
-          profilePicture: user.profilePicture,
-        };
-        return defaultProfile;
-      }
-      throw new Error('User not found');
-    }
+    return await apiRequest<UserProfile>(`/users/${userId}/profile`, { method: 'GET' });
   },
 
   update: async (userId: string, profile: Partial<UserProfile>): Promise<{ success: boolean }> => {
-    return await apiRequest<{ success: boolean }>(`updateUserProfile&userId=${userId}`, {
+    return await apiRequest<{ success: boolean }>(`/users/${userId}/profile`, {
       method: 'PUT',
       body: JSON.stringify(profile),
     });
@@ -254,111 +161,41 @@ export const userProfileApi = {
 // Projects API
 export const projectsApi = {
   getAll: async (): Promise<Project[]> => {
-    try {
-      // Try server API first
-      return await apiRequest<Project[]>('getProjects');
-    } catch (error) {
-      console.log('⚠️ Server API unavailable, using local fallback');
-      // Fallback to local storage or JSON file
-      return await loadFromLocalOrFile<Project[]>('projects_data', 'projects.json', []);
-    }
+    return await apiRequest<Project[]>('/projects', { method: 'GET' });
   },
 
   create: async (projectData: Omit<Project, 'id' | 'createdAt' | 'incomes' | 'expenses' | 'milestones' | 'isArchived'>): Promise<Project> => {
-    try {
-      return await apiRequest<Project>('createProject', {
-        method: 'POST',
-        body: JSON.stringify(projectData),
-      });
-    } catch (error) {
-      // Fallback: create locally
-      console.log('⚠️ Server API unavailable, creating project locally');
-      const newProject: Project = {
-        ...projectData,
-        id: `project_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        incomes: [],
-        expenses: [],
-        milestones: [],
-        isArchived: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        createdBy: (projectData as any).createdBy || 'current-user',
-        ownerId: (projectData as any).ownerId || 'current-user'
-      };
-      
-      // Save to localStorage
-      const projects = await projectsApi.getAll();
-      projects.push(newProject);
-      localStorage.setItem('projects_data', JSON.stringify(projects));
-      
-      return newProject;
-    }
+    return await apiRequest<Project>('/projects', {
+      method: 'POST',
+      body: JSON.stringify(projectData),
+    });
   },
 
   update: async (projectId: string, projectData: Partial<Project>): Promise<Project> => {
-    try {
-      await apiRequest<{success: boolean}>(`updateProject&id=${projectId}`, {
-        method: 'PUT',
-        body: JSON.stringify(projectData),
-      });
-    } catch (error) {
-      console.log('⚠️ Server API unavailable, updating project locally');
-    }
-    
-    // Always update locally as fallback
-    const projects = await projectsApi.getAll();
-    const projectIndex = projects.findIndex(p => p.id === projectId);
-    if (projectIndex === -1) throw new Error('Project not found');
-    
-    projects[projectIndex] = {
-      ...projects[projectIndex],
-      ...projectData,
-      updatedAt: new Date().toISOString()
-    };
-    localStorage.setItem('projects_data', JSON.stringify(projects));
-    
-    return projects[projectIndex];
+    return await apiRequest<Project>(`/projects/${projectId}`, {
+      method: 'PUT',
+      body: JSON.stringify(projectData),
+    });
   },
 
   archive: async (projectId: string): Promise<Project> => {
-    try {
-      await apiRequest<{success: boolean}>(`updateProject&id=${projectId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ isArchived: true }),
-      });
-    } catch (error) {
-      console.log('⚠️ Server API unavailable, archiving project locally');
-    }
-    
-    return await projectsApi.update(projectId, { isArchived: true } as any);
+    return await apiRequest<Project>(`/projects/${projectId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ isArchived: true }),
+    });
   },
 
   unarchive: async (projectId: string): Promise<Project> => {
-    try {
-      await apiRequest<{success: boolean}>(`updateProject&id=${projectId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ isArchived: false }),
-      });
-    } catch (error) {
-      console.log('⚠️ Server API unavailable, unarchiving project locally');
-    }
-    
-    return await projectsApi.update(projectId, { isArchived: false } as any);
+    return await apiRequest<Project>(`/projects/${projectId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ isArchived: false }),
+    });
   },
 
   delete: async (projectId: string): Promise<void> => {
-    try {
-      await apiRequest<{success: boolean}>(`deleteProject&id=${projectId}`, {
-        method: 'DELETE',
-      });
-    } catch (error) {
-      console.log('⚠️ Server API unavailable, deleting project locally');
-    }
-    
-    // Always delete locally
-    const projects = await projectsApi.getAll();
-    const filtered = projects.filter(p => p.id !== projectId);
-    localStorage.setItem('projects_data', JSON.stringify(filtered));
+    await apiRequest<{success: boolean}>(`/projects/${projectId}`, {
+      method: 'DELETE',
+    });
   },
 
   deleteAll: async (): Promise<void> => {
@@ -473,30 +310,25 @@ export const projectsApi = {
 // Categories API
 export const categoriesApi = {
   getAll: async (): Promise<Category[]> => {
-    try {
-      return await apiRequest<Category[]>('getCategories');
-    } catch (error) {
-      console.log('⚠️ Server API unavailable, using local fallback for categories');
-      return await loadFromLocalOrFile<Category[]>('categories_data', '/data/categories.json', []);
-    }
+    return await apiRequest<Category[]>('/categories', { method: 'GET' });
   },
 
   create: async (categoryData: Omit<Category, 'id'>): Promise<Category> => {
-    return await apiRequest<Category>('createCategory', {
+    return await apiRequest<Category>('/categories', {
       method: 'POST',
       body: JSON.stringify(categoryData),
     });
   },
 
   update: async (categoryId: string, categoryData: Partial<Category>): Promise<void> => {
-    await apiRequest<{success: boolean}>(`updateCategory&id=${categoryId}`, {
+    await apiRequest<{success: boolean}>(`/categories/${categoryId}`, {
       method: 'PUT',
       body: JSON.stringify(categoryData),
     });
   },
 
   delete: async (categoryId: string): Promise<void> => {
-    await apiRequest<{success: boolean}>(`deleteCategory&id=${categoryId}`, {
+    await apiRequest<{success: boolean}>(`/categories/${categoryId}`, {
       method: 'DELETE',
     });
   },
@@ -539,30 +371,25 @@ export const categoriesApi = {
 // Suppliers API
 export const suppliersApi = {
   getAll: async (): Promise<Supplier[]> => {
-    try {
-      return await apiRequest<Supplier[]>('getSuppliers');
-    } catch (error) {
-      console.log('⚠️ Server API unavailable, using local fallback for suppliers');
-      return await loadFromLocalOrFile<Supplier[]>('suppliers_data', '/data/suppliers.json', []);
-    }
+    return await apiRequest<Supplier[]>('/suppliers', { method: 'GET' });
   },
 
   create: async (supplierData: Omit<Supplier, 'id' | 'createdAt'>): Promise<Supplier> => {
-    return await apiRequest<Supplier>('createSupplier', {
+    return await apiRequest<Supplier>('/suppliers', {
       method: 'POST',
       body: JSON.stringify(supplierData),
     });
   },
 
   update: async (supplierId: string, supplierData: Partial<Supplier>): Promise<void> => {
-    await apiRequest<{success: boolean}>(`updateSupplier&id=${supplierId}`, {
+    await apiRequest<{success: boolean}>(`/suppliers/${supplierId}`, {
       method: 'PUT',
       body: JSON.stringify(supplierData),
     });
   },
 
   delete: async (supplierId: string): Promise<void> => {
-    await apiRequest<{success: boolean}>(`deleteSupplier&id=${supplierId}`, {
+    await apiRequest<{success: boolean}>(`/suppliers/${supplierId}`, {
       method: 'DELETE',
     });
   },
