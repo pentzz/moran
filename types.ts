@@ -11,8 +11,32 @@ export enum PaymentStatus {
 }
 
 export enum UserRole {
+  SuperAdmin = 'superAdmin',
   Admin = 'admin',
   User = 'user'
+}
+
+// Organization interface for multi-tenant support
+export interface Organization {
+  id: string;
+  name: string; // שם הקבלן/ארגון
+  logo?: string; // Base64 או URL ללוגו
+  contactPerson: string;
+  email: string;
+  phone: string;
+  address?: string;
+  vatNumber?: string; // ע.מ / ח.פ
+  businessNumber?: string;
+  settings: {
+    vatRate: number; // מע"מ באחוזים (ברירת מחדל 18%)
+    taxRate: number; // מס הכנסה באחוזים
+    currency: string; // מטבע (ברירת מחדל: ILS)
+    companyName?: string; // שם החברה המלא
+  };
+  createdAt: string;
+  createdBy: string; // User ID של מורן
+  updatedAt?: string;
+  isActive: boolean;
 }
 
 // User interface
@@ -21,6 +45,7 @@ export interface User {
   username: string;
   password: string;
   role: UserRole;
+  organizationId?: string; // null/undefined for SuperAdmin, required for others
   fullName?: string;
   email?: string;
   createdAt: string;
@@ -58,8 +83,9 @@ export interface ActivityLog {
   id: string;
   userId: string;
   username: string;
+  organizationId?: string; // Which organization this activity belongs to
   action: string;
-  entityType: 'project' | 'income' | 'expense' | 'user' | 'category' | 'supplier';
+  entityType: 'project' | 'income' | 'expense' | 'user' | 'category' | 'supplier' | 'organization';
   entityId: string;
   details: string;
   timestamp: string;
@@ -164,6 +190,7 @@ export interface Expense {
 
 export interface Project {
   id: string;
+  organizationId: string; // Required - which organization owns this project
   name: string;
   description: string;
   contractAmount: number;

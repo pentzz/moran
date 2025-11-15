@@ -1,0 +1,20 @@
+[
+  {
+    "id": "demo-org",
+    "name": "ארגון הדגמה",
+    "contactPerson": "ליטל ב",
+    "email": "demo@example.com",
+    "phone": "050-1234567",
+    "address": "רחוב הדגמה 1, תל אביב",
+    "vatNumber": "123456789",
+    "settings": {
+      "vatRate": 18,
+      "taxRate": 0,
+      "currency": "ILS",
+      "companyName": "חברת הדגמה בע\"מ"
+    },
+    "createdAt": "2025-01-01T00:00:00+00:00",
+    "createdBy": "super-admin",
+    "isActive": true
+  }
+]

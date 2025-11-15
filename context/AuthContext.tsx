@@ -10,6 +10,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   impersonateUser: (targetUser: User) => void;
   stopImpersonation: () => void;
   isImpersonating: boolean;
@@ -96,7 +97,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const impersonateUser = (targetUser: User) => {
-    if (user && (user.role === UserRole.Admin || user.role === 'admin')) {
+    if (user && (user.role === UserRole.SuperAdmin || user.role === UserRole.Admin || user.role === 'admin' || user.role === 'superAdmin')) {
       setOriginalUser(user);
       setUser(targetUser);
       setIsImpersonating(true);
@@ -137,16 +138,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const isAuthenticated = authToken !== null && user !== null;
-  const isAdmin = user?.role === UserRole.Admin || user?.role === 'admin';
+  const isSuperAdmin = user?.role === UserRole.SuperAdmin || user?.role === 'superAdmin';
+  const isAdmin = user?.role === UserRole.Admin || user?.role === 'admin' || isSuperAdmin;
 
   return (
-    <AuthContext.Provider value={{ 
-      isAuthenticated, 
-      login, 
-      logout, 
-      user, 
+    <AuthContext.Provider value={{
+      isAuthenticated,
+      login,
+      logout,
+      user,
       isLoading,
       isAdmin,
+      isSuperAdmin,
       impersonateUser,
       stopImpersonation,
       isImpersonating,

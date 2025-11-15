@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthContext';
 import { UsersProvider } from './context/UsersContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { ToastProvider } from './context/ToastContext';
+import { OrganizationsProvider } from './context/OrganizationsContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -19,17 +20,19 @@ root.render(
   <React.StrictMode>
     <ToastProvider>
       <AuthProvider>
-        <UsersProvider>
-          <SettingsProvider>
-            <ProjectsProvider>
-              <CategoriesProvider>
-                <SuppliersProvider>
-                  <App />
-                </SuppliersProvider>
-              </CategoriesProvider>
-            </ProjectsProvider>
-          </SettingsProvider>
-        </UsersProvider>
+        <OrganizationsProvider>
+          <UsersProvider>
+            <SettingsProvider>
+              <ProjectsProvider>
+                <CategoriesProvider>
+                  <SuppliersProvider>
+                    <App />
+                  </SuppliersProvider>
+                </CategoriesProvider>
+              </ProjectsProvider>
+            </SettingsProvider>
+          </UsersProvider>
+        </OrganizationsProvider>
       </AuthProvider>
     </ToastProvider>
   </React.StrictMode>

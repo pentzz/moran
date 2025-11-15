@@ -17,8 +17,10 @@ import UserNotificationSystem from './components/UserNotificationSystem';
 import AdminNotificationSystem from './components/AdminNotificationSystem';
 import UserProfilePage from './components/UserProfilePage';
 import KeyboardShortcuts from './components/KeyboardShortcuts';
+import OrganizationManagement from './components/OrganizationManagement';
+import SuperAdminDashboard from './components/SuperAdminDashboard';
 
-type View = 'projectsList' | 'projectView' | 'settings' | 'users' | 'guide' | 'adminDashboard' | 'adminProfessionalDashboard' | 'profile' | 'allProjects' | 'activityLog' | 'adminNotifications';
+type View = 'projectsList' | 'projectView' | 'settings' | 'users' | 'guide' | 'adminDashboard' | 'adminProfessionalDashboard' | 'profile' | 'allProjects' | 'activityLog' | 'adminNotifications' | 'organizations' | 'superAdminDashboard';
 
 const Header: React.FC<{
   title: string;
@@ -165,7 +167,7 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('projectsList');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const { getProject } = useProjects();
-  const { isAuthenticated, logout, user, isAdmin, isImpersonating, stopImpersonation } = useAuth();
+  const { isAuthenticated, logout, user, isAdmin, isSuperAdmin, isImpersonating, stopImpersonation } = useAuth();
 
   // Listen for navigation events from quick actions
   React.useEffect(() => {
@@ -222,6 +224,10 @@ const App: React.FC = () => {
         return 'התראות מותאמות';
       case 'profile':
         return 'פרופיל אישי';
+      case 'organizations':
+        return 'ניהול ארגונים';
+      case 'superAdminDashboard':
+        return 'לוח בקרה ראשי';
       case 'projectsList':
       default:
         return 'ניהול פרויקטים';
@@ -250,6 +256,10 @@ const App: React.FC = () => {
         return <AdminNotificationSystem />;
       case 'profile':
         return <UserProfilePage />;
+      case 'organizations':
+        return <OrganizationManagement />;
+      case 'superAdminDashboard':
+        return <SuperAdminDashboard onNavigate={(view) => setCurrentView(view as View)} />;
       case 'projectsList':
       default:
         return <ProjectsList onSelectProject={handleSelectProject} />;
@@ -266,6 +276,10 @@ const App: React.FC = () => {
     { key: 's', ctrl: true, description: 'הגדרות', action: () => setCurrentView('settings') },
     { key: 'g', description: 'מדריך למשתמש', action: () => setCurrentView('guide') },
     { key: 'p', description: 'פרופיל אישי', action: () => setCurrentView('profile') },
+    ...(isSuperAdmin && !isImpersonating ? [
+      { key: 'm', description: 'לוח בקרה ראשי', action: () => setCurrentView('superAdminDashboard') },
+      { key: 'o', description: 'ניהול ארגונים', action: () => setCurrentView('organizations') },
+    ] : []),
     ...(isAdmin && !isImpersonating ? [
       { key: 'd', description: 'לוח בקרה פשוט', action: () => setCurrentView('adminProfessionalDashboard') },
       { key: 'u', description: 'ניהול משתמשים', action: () => setCurrentView('users') },
