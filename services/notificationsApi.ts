@@ -100,4 +100,14 @@ export const notificationsApi = {
       throw new Error('Failed to mark all notifications as read');
     }
   },
+
+  // Delete a notification
+  deleteNotification: async (notificationId: string): Promise<void> => {
+    const response = await fetch(`${API_BASE}?action=deleteNotification&id=${notificationId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete notification');
+    }
+  },
 };

@@ -132,9 +132,10 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const logActivity = async (action: string, entityType: ActivityLog['entityType'], entityId: string, details: string) => {
     if (!currentUser) return;
-    
+
     const logData = {
       userId: currentUser.id,
+      username: currentUser.username,
       action,
       entityType,
       entityId,

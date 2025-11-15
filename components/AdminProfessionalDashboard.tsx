@@ -66,7 +66,7 @@ const AdminProfessionalDashboard: React.FC = () => {
   const { users, activityLogs } = useUsers();
   const { user: currentUser } = useAuth();
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
-  // Simplified - no tabs, just one dashboard
+  const [activeTab, setActiveTab] = useState<'overview' | 'activity' | 'reports' | 'permissions'>('overview');
 
   const dashboardStats = useMemo(() => {
     const now = new Date();

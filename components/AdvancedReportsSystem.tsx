@@ -319,9 +319,9 @@ ${reportData?.categoryBreakdown.map(item =>
             <select
               multiple
               value={filter.projectIds}
-              onChange={(e) => setFilter(prev => ({ 
-                ...prev, 
-                projectIds: Array.from(e.target.selectedOptions, option => option.value) 
+              onChange={(e) => setFilter(prev => ({
+                ...prev,
+                projectIds: Array.from(e.target.selectedOptions, (option: HTMLOptionElement) => option.value)
               }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -342,9 +342,9 @@ ${reportData?.categoryBreakdown.map(item =>
               <select
                 multiple
                 value={filter.userIds}
-                onChange={(e) => setFilter(prev => ({ 
-                  ...prev, 
-                  userIds: Array.from(e.target.selectedOptions, option => option.value) 
+                onChange={(e) => setFilter(prev => ({
+                  ...prev,
+                  userIds: Array.from(e.target.selectedOptions, (option: HTMLOptionElement) => option.value)
                 }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >

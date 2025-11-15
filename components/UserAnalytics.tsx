@@ -104,8 +104,8 @@ const UserAnalytics: React.FC<UserAnalyticsProps> = ({ user }) => {
 
     const categoryData = Object.entries(expensesByCategory).map(([category, amount]) => ({
       category,
-      amount,
-      percentage: totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(1) : '0'
+      amount: amount as number,
+      percentage: totalExpenses > 0 ? (((amount as number) / totalExpenses) * 100).toFixed(1) : '0'
     }));
 
     return {

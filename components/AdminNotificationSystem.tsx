@@ -124,10 +124,15 @@ const AdminNotificationSystem: React.FC = () => {
     }
   };
 
-  const deleteNotification = (notificationId: string) => {
+  const deleteNotification = async (notificationId: string) => {
     if (confirm('האם אתה בטוח שברצונך למחוק את ההתראה?')) {
-      const updatedNotifications = notifications.filter(n => n.id !== notificationId);
-      saveNotifications(updatedNotifications);
+      try {
+        await notificationsApi.deleteNotification(notificationId);
+        await loadNotifications();
+      } catch (error) {
+        console.error('Error deleting notification:', error);
+        alert('שגיאה במחיקת ההתראה');
+      }
     }
   };
 
@@ -158,7 +163,7 @@ const AdminNotificationSystem: React.FC = () => {
     }
   };
 
-  const getTypeIcon = (type: CustomNotification['type']) => {
+  const getTypeIcon = (type: Notification['type']) => {
     switch (type) {
       case 'success': return '✅';
       case 'warning': return '⚠️';
@@ -359,7 +364,7 @@ const AdminNotificationSystem: React.FC = () => {
             </label>
             <select
               value={formData.type}
-              onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as CustomNotification['type'] }))}
+              onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as Notification['type'] }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="info">מידע</option>
