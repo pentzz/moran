@@ -16,6 +16,7 @@ import NotificationsSystem from './components/NotificationsSystem';
 import UserNotificationSystem from './components/UserNotificationSystem';
 import AdminNotificationSystem from './components/AdminNotificationSystem';
 import UserProfilePage from './components/UserProfilePage';
+import KeyboardShortcuts from './components/KeyboardShortcuts';
 
 type View = 'projectsList' | 'projectView' | 'settings' | 'users' | 'guide' | 'adminDashboard' | 'adminProfessionalDashboard' | 'profile' | 'allProjects' | 'activityLog' | 'adminNotifications';
 
@@ -260,11 +261,26 @@ const App: React.FC = () => {
     return <LoginPage />;
   }
 
+  const keyboardShortcuts = [
+    { key: 'h', description: 'חזור לדף הבית', action: () => setCurrentView('projectsList') },
+    { key: 's', ctrl: true, description: 'הגדרות', action: () => setCurrentView('settings') },
+    { key: 'g', description: 'מדריך למשתמש', action: () => setCurrentView('guide') },
+    { key: 'p', description: 'פרופיל אישי', action: () => setCurrentView('profile') },
+    ...(isAdmin && !isImpersonating ? [
+      { key: 'd', description: 'לוח בקרה פשוט', action: () => setCurrentView('adminProfessionalDashboard') },
+      { key: 'u', description: 'ניהול משתמשים', action: () => setCurrentView('users') },
+      { key: 'a', description: 'כל הפרויקטים', action: () => setCurrentView('allProjects') },
+      { key: 'l', description: 'מעקב פעילות', action: () => setCurrentView('activityLog') },
+      { key: 'n', description: 'התראות מותאמות', action: () => setCurrentView('adminNotifications') },
+    ] : []),
+    { key: 'Escape', description: 'חזור', action: () => currentView !== 'projectsList' && handleBack() },
+  ];
+
   return (
     <div className="bg-gray-50 min-h-screen text-gray-800">
-      <Header 
-        onBack={currentView !== 'projectsList' ? handleBack : undefined} 
-        title={getTitle()} 
+      <Header
+        onBack={currentView !== 'projectsList' ? handleBack : undefined}
+        title={getTitle()}
         onOpenSettings={() => setCurrentView('settings')}
         onOpenUsers={isAdmin && !isImpersonating ? () => setCurrentView('users') : undefined}
         onOpenAdminDashboard={isAdmin && !isImpersonating ? () => setCurrentView('adminDashboard') : undefined}
@@ -282,6 +298,7 @@ const App: React.FC = () => {
       <footer className="text-center p-2 sm:p-4 text-xs sm:text-sm text-gray-500">
       נבנה עבור מחוברות © {new Date().getFullYear()} | כל הזכויות שמורות לאופיר ברנס
       </footer>
+      <KeyboardShortcuts shortcuts={keyboardShortcuts} />
     </div>
   );
 };

@@ -352,7 +352,7 @@ const ExpenseTable: React.FC<{ title: string; expenses: Expense[]; projectId: st
                                         )}
                                     </td>
                                     <td className="px-6 py-4 text-center">
-                                        <button onClick={() => handleDeleteExpense(expense.id, expense.description)} className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors" aria-label={`מחק הוצאה: ${expense.description}`}>
+                                        <button onClick={() => deleteExpense(projectId, expense.id)} className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors" aria-label={`מחק הוצאה: ${expense.description}`}>
                                             <TrashIcon />
                                         </button>
                                     </td>

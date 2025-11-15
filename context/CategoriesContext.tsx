@@ -59,7 +59,7 @@ export const CategoriesProvider: React.FC<{ children: ReactNode }> = ({ children
     setLoading(true);
     setError(null);
     try {
-      const newCategory = await categoriesApi.create(name);
+      const newCategory = await categoriesApi.create({ name, subcategories: [] });
       setCategories(prev => [...prev, newCategory]);
     } catch (error) {
       handleError(error);
@@ -77,8 +77,8 @@ export const CategoriesProvider: React.FC<{ children: ReactNode }> = ({ children
     setLoading(true);
     setError(null);
     try {
-      const updatedCategory = await categoriesApi.update(id, newName);
-      setCategories(prev => prev.map(c => c.id === id ? updatedCategory : c));
+      await categoriesApi.update(id, { name: newName });
+      setCategories(prev => prev.map(c => c.id === id ? { ...c, name: newName } : c));
     } catch (error) {
       handleError(error);
       throw error;
@@ -112,9 +112,9 @@ export const CategoriesProvider: React.FC<{ children: ReactNode }> = ({ children
     setLoading(true);
     setError(null);
     try {
-      const newSubcategory = await categoriesApi.addSubcategory(categoryId, name);
-      setCategories(prev => prev.map(c => 
-        c.id === categoryId 
+      const newSubcategory = await categoriesApi.addSubcategory(categoryId, { name, categoryId });
+      setCategories(prev => prev.map(c =>
+        c.id === categoryId
           ? { ...c, subcategories: [...(c.subcategories || []), newSubcategory] }
           : c
       ));
@@ -132,14 +132,14 @@ export const CategoriesProvider: React.FC<{ children: ReactNode }> = ({ children
     setLoading(true);
     setError(null);
     try {
-      const updatedSubcategory = await categoriesApi.updateSubcategory(categoryId, subcategoryId, newName);
-      setCategories(prev => prev.map(c => 
-        c.id === categoryId 
-          ? { 
-              ...c, 
-              subcategories: c.subcategories?.map(s => 
-                s.id === subcategoryId ? updatedSubcategory : s
-              ) 
+      await categoriesApi.updateSubcategory(categoryId, subcategoryId, { name: newName });
+      setCategories(prev => prev.map(c =>
+        c.id === categoryId
+          ? {
+              ...c,
+              subcategories: c.subcategories?.map(s =>
+                s.id === subcategoryId ? { ...s, name: newName } : s
+              )
             }
           : c
       ));

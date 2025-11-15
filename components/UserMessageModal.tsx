@@ -38,10 +38,10 @@ const UserMessageModal: React.FC<UserMessageModalProps> = ({
     }
   };
 
-  const handleTemplateChange = (type: keyof typeof messageTemplates) => {
+  const handleTemplateChange = (type: 'reminder' | 'warning' | 'info' | 'custom') => {
     setMessageType(type);
     if (type !== 'custom') {
-      const template = messageTemplates[type];
+      const template = messageTemplates[type as keyof typeof messageTemplates];
       setSubject(template.subject);
       setMessage(template.message);
     }
