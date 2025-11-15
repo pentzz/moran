@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { Supplier } from '../types';
-import { suppliersApi, ApiError } from '../services/api';
+import { suppliersApi } from '../services/serverApi';
 
 interface SuppliersContextType {
   suppliers: Supplier[];
@@ -26,7 +26,7 @@ export const SuppliersProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, []);
 
   const handleError = (error: any) => {
-    if (error instanceof ApiError) {
+    if (error?.message) {
       setError(error.message);
     } else {
       setError('שגיאה לא צפויה');

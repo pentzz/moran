@@ -23,42 +23,42 @@ const ProjectCard: React.FC<{ project: Project; onSelect: (id: string) => void; 
 
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col">
-      <div className="p-6 flex-grow">
+      <div className="p-3 sm:p-4 md:p-6 flex-grow">
         <div onClick={() => onSelect(project.id)} className="cursor-pointer">
-            <h2 className="text-xl font-bold text-blue-700 mb-2">{project.name}</h2>
-            <p className="text-gray-600 text-sm mb-4 h-10 overflow-hidden">{project.description}</p>
-            
-            <div className="space-y-2 text-sm mb-4">
-                 <div className="flex justify-between">
-                    <span className="font-semibold">סכום חוזה:</span>
-                    <span className="font-bold">{formatCurrency(project.contractAmount)}</span>
+            <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">{project.name}</h2>
+            <p className="text-gray-600 text-xs sm:text-sm mb-4 h-10 overflow-hidden line-clamp-2">{project.description}</p>
+
+            <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm mb-4">
+                 <div className="flex justify-between items-center gap-2">
+                    <span className="font-semibold text-gray-600 truncate">סכום חוזה:</span>
+                    <span className="font-bold whitespace-nowrap">{formatCurrency(project.contractAmount)}</span>
                 </div>
-                 <div className="flex justify-between">
-                    <span className="font-semibold">יתרת תקציב:</span>
-                    <span className={`font-bold ${remainingBudget >=0 ? 'text-gray-800' : 'text-red-600'}`}>{formatCurrency(remainingBudget)}</span>
+                 <div className="flex justify-between items-center gap-2">
+                    <span className="font-semibold text-gray-600 truncate">יתרת תקציב:</span>
+                    <span className={`font-bold whitespace-nowrap ${remainingBudget >=0 ? 'text-gray-800' : 'text-red-600'}`}>{formatCurrency(remainingBudget)}</span>
                 </div>
-                 <div className="flex justify-between">
-                    <span className="font-semibold">שולי רווח:</span>
-                    <span className={`font-bold ${profitMargin >= 0 ? 'text-green-700' : 'text-red-700'}`}>{profitMargin.toFixed(1)}%</span>
+                 <div className="flex justify-between items-center gap-2">
+                    <span className="font-semibold text-gray-600 truncate">שולי רווח:</span>
+                    <span className={`font-bold whitespace-nowrap ${profitMargin >= 0 ? 'text-green-700' : 'text-red-700'}`}>{profitMargin.toFixed(1)}%</span>
                 </div>
             </div>
 
             <div>
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                    <span>ניצול תקציב</span>
-                    <span>{formatCurrency(totalExpenses)} / {formatCurrency(project.contractAmount)}</span>
+                <div className="flex flex-col xs:flex-row xs:justify-between text-xs text-gray-500 mb-1 gap-0.5">
+                    <span className="font-medium">ניצול תקציב</span>
+                    <span className="truncate">{formatCurrency(totalExpenses)} / {formatCurrency(project.contractAmount)}</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${Math.min(budgetUsedPercent, 100)}%` }}></div>
+                <div className="w-full bg-gray-200 rounded-full h-2 sm:h-2.5">
+                    <div className="bg-blue-600 h-2 sm:h-2.5 rounded-full transition-all duration-300" style={{ width: `${Math.min(budgetUsedPercent, 100)}%` }}></div>
                 </div>
             </div>
         </div>
       </div>
-      <div className="bg-gray-50 p-3 flex justify-end space-i-2 rounded-b-lg">
-        <button onClick={(e) => { e.stopPropagation(); onEdit(project); }} className="p-2 text-gray-500 hover:text-blue-600" aria-label={`ערוך את פרויקט ${project.name}`}>
+      <div className="bg-gray-50 p-2 sm:p-3 flex justify-end space-x-2 rounded-b-lg">
+        <button onClick={(e) => { e.stopPropagation(); onEdit(project); }} className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 transition-colors touch-manipulation" aria-label={`ערוך את פרויקט ${project.name}`}>
           <EditIcon />
         </button>
-        <button onClick={(e) => { e.stopPropagation(); onArchive(project.id); }} className="p-2 text-gray-500 hover:text-yellow-600" aria-label={`העבר לארכיון את פרויקט ${project.name}`}>
+        <button onClick={(e) => { e.stopPropagation(); onArchive(project.id); }} className="p-1.5 sm:p-2 text-gray-500 hover:text-yellow-600 transition-colors touch-manipulation" aria-label={`העבר לארכיון את פרויקט ${project.name}`}>
           <ArchiveIcon />
         </button>
       </div>
@@ -92,7 +92,7 @@ const ProjectForm: React.FC<{ project?: Project; onSave: (name: string, descript
                 <label htmlFor="contractAmount" className="block text-sm font-medium text-gray-700">סכום חוזה (₪)</label>
                 <input type="number" id="contractAmount" value={contractAmount} onChange={(e) => setContractAmount(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" required />
             </div>
-            <div className="flex justify-end space-i-2 pt-4">
+            <div className="flex justify-end space-x-2 pt-4">
                 <button type="button" onClick={onCancel} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">ביטול</button>
                 <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">שמור</button>
             </div>
@@ -102,7 +102,7 @@ const ProjectForm: React.FC<{ project?: Project; onSave: (name: string, descript
 
 
 const ProjectsList: React.FC<{ onSelectProject: (id: string) => void }> = ({ onSelectProject }) => {
-  const { projects, addProject, updateProject, archiveProject } = useProjects();
+  const { projects, addProject, updateProject, archiveProject, loading, error, refreshProjects } = useProjects();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [archivingProjectId, setArchivingProjectId] = useState<string | null>(null);
@@ -158,6 +158,33 @@ const ProjectsList: React.FC<{ onSelectProject: (id: string) => void }> = ({ onS
       });
   }, [activeProjects, searchTerm, sortKey]);
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="text-center py-16">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <p className="text-gray-600">טוען פרויקטים...</p>
+      </div>
+    );
+  }
+  
+  // Show error state with retry
+  if (error) {
+    return (
+      <div className="text-center py-16">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+          <p className="text-red-800 font-semibold mb-2">שגיאה בטעינת הפרויקטים</p>
+          <p className="text-red-600 text-sm mb-4">{error}</p>
+          <button 
+            onClick={refreshProjects}
+            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+          >
+            נסה שוב
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (activeProjects.length === 0 && !isModalOpen) {
     return (
@@ -176,11 +203,11 @@ const ProjectsList: React.FC<{ onSelectProject: (id: string) => void }> = ({ onS
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-6 md:space-y-8 px-2 sm:px-0">
         <GlobalDashboard projects={activeProjects} />
 
-        <div className="bg-white p-4 rounded-lg shadow-md">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-md">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
                 <div className="md:col-span-2">
                     <label htmlFor="search-project" className="sr-only">חיפוש פרויקט</label>
                     <input
@@ -210,14 +237,14 @@ const ProjectsList: React.FC<{ onSelectProject: (id: string) => void }> = ({ onS
         </div>
 
         <div className="flex justify-end">
-            <button onClick={handleAddClick} className="bg-blue-600 text-white font-semibold px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 inline-flex items-center">
+            <button onClick={handleAddClick} className="bg-blue-600 text-white font-semibold px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow-md hover:bg-blue-700 active:bg-blue-800 transition-colors duration-300 inline-flex items-center touch-manipulation text-sm sm:text-base">
                 <PlusIcon />
                 <span className="mr-2">הוסף פרויקט</span>
             </button>
         </div>
 
         {sortedAndFilteredProjects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                 {sortedAndFilteredProjects.map(p => (
                     <ProjectCard key={p.id} project={p} onSelect={onSelectProject} onEdit={handleEditClick} onArchive={setArchivingProjectId} />
                 ))}
@@ -231,7 +258,7 @@ const ProjectsList: React.FC<{ onSelectProject: (id: string) => void }> = ({ onS
         </Modal>
         <Modal isOpen={archivingProjectId !== null} title="אישור העברה לארכיון" onClose={() => setArchivingProjectId(null)}>
             <p>האם להעביר פרויקט זה לארכיון? תוכל לשחזר אותו מאוחר יותר דרך מסך ההגדרות.</p>
-            <div className="flex justify-end space-i-2 pt-4">
+            <div className="flex justify-end space-x-2 pt-4">
                 <button onClick={() => setArchivingProjectId(null)} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">ביטול</button>
                 <button onClick={handleArchiveConfirm} className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700">העבר לארכיון</button>
             </div>

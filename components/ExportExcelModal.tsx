@@ -63,9 +63,26 @@ const ExportExcelModal: React.FC<ExportExcelModalProps> = ({ project, summaryDat
       <div className="space-y-6 text-center">
         <div>
           <p className="text-gray-600 mb-4">בחר את סוג הקובץ ורמת הפירוט:</p>
-          <div className="text-sm text-gray-500 space-y-2 mb-6">
-            <p><strong>דוח מקוצר:</strong> פירוט ספקים בלבד</p>
-            <p><strong>דוח מלא:</strong> פירוט ספקים + פירוט מלא של הכנסות (תאריכים, אחוזים ומעקב מצטבר)</p>
+          <div className="text-sm text-gray-500 space-y-2 mb-6 bg-gray-50 p-4 rounded-lg text-right">
+            <p className="font-semibold text-gray-700 mb-2">📊 אקסל מקוצר:</p>
+            <ul className="list-disc list-inside space-y-1 text-gray-600">
+              <li>סיכום פיננסי כללי (חוזה, הכנסות, הוצאות, רווח/הפסד)</li>
+              <li>ניתוח הוצאות לפי קטגוריות (רק קבלני משנה וחומרי בנייה)</li>
+              <li>דוח ספקים עם השוואת הסכם מול תשלום בפועל</li>
+              <li>סטטוס פרויקט: רווחי או דורש שיפור</li>
+            </ul>
+            <p className="font-semibold text-gray-700 mb-2 mt-4">📊 אקסל מלא:</p>
+            <ul className="list-disc list-inside space-y-1 text-gray-600">
+              <li>כל מה שבדוח המקוצר +</li>
+              <li>פירוט מלא של כל ההכנסות (תאריכים, סכומים, אחוזים, מצטבר)</li>
+              <li>פירוט מלא של כל ההוצאות לפי קטגוריות</li>
+              <li>ניתוח מפורט של אבני דרך פרויקט</li>
+            </ul>
+            <p className="text-xs text-gray-500 mt-4 italic">
+              💡 <strong>"דורש שיפור"</strong> = הפרויקט בהפסד (הוצאות גבוהות מהכנסות). 
+              מחושב כ: רווח/הפסד = הכנסות מצטברות - הוצאות מצטברות. 
+              אם התוצאה שלילית, הפרויקט מסומן כ"דורש שיפור".
+            </p>
           </div>
         </div>
 

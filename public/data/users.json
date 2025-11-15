@@ -1,0 +1,24 @@
+[
+  {
+    "id": "super-admin",
+    "username": "moran",
+    "password": "M123456",
+    "role": "admin",
+    "fullName": "מורן מרקוביץ",
+    "email": "moran@mechubarot.com",
+    "createdAt": "2025-01-01T00:00:00+00:00",
+    "lastLogin": null,
+    "isActive": true
+  },
+  {
+    "id": "legacy-user",
+    "username": "litalb",
+    "password": "123456",
+    "role": "user",
+    "fullName": "ליטל ב",
+    "email": null,
+    "createdAt": "2025-01-01T00:00:00+00:00",
+    "lastLogin": null,
+    "isActive": true
+  }
+]

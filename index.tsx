@@ -5,6 +5,9 @@ import { ProjectsProvider } from './context/ProjectsContext';
 import { CategoriesProvider } from './context/CategoriesContext';
 import { SuppliersProvider } from './context/SuppliersContext';
 import { AuthProvider } from './context/AuthContext';
+import { UsersProvider } from './context/UsersContext';
+import { SettingsProvider } from './context/SettingsContext';
+import { ToastProvider } from './context/ToastContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -14,14 +17,20 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <ProjectsProvider>
-        <CategoriesProvider>
-          <SuppliersProvider>
-            <App />
-          </SuppliersProvider>
-        </CategoriesProvider>
-      </ProjectsProvider>
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <UsersProvider>
+          <SettingsProvider>
+            <ProjectsProvider>
+              <CategoriesProvider>
+                <SuppliersProvider>
+                  <App />
+                </SuppliersProvider>
+              </CategoriesProvider>
+            </ProjectsProvider>
+          </SettingsProvider>
+        </UsersProvider>
+      </AuthProvider>
+    </ToastProvider>
   </React.StrictMode>
 );

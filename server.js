@@ -12,13 +12,40 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.static('dist')); // Serve built files
 app.use(express.static(__dirname)); // Serve logo and other static files from root
 
-// Data directory - check if running from dist or development
-const DATA_DIR = fs.existsSync(path.join(__dirname, 'dist', 'data'))
-  ? path.join(__dirname, 'dist', 'data')  // Production: data in dist folder
-  : path.join(__dirname, 'public', 'data'); // Development: data in public folder
-const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json');
-const CATEGORIES_FILE = path.join(DATA_DIR, 'categories.json');
-const SUPPLIERS_FILE = path.join(DATA_DIR, 'suppliers.json');
+// Data directory - שמירת נתונים רב-שכבתית עם גיבוי
+const PRODUCTION_DATA_DIR = path.join(__dirname, 'data');
+const DEV_DATA_DIR = path.join(__dirname, 'public', 'data');
+const DIST_DATA_DIR = path.join(__dirname, 'dist', 'data');
+
+// נקבע את תיקיית הנתונים הראשית
+let DATA_DIR = PRODUCTION_DATA_DIR;
+
+// בדיקה האם נתונים קיימים בתיקיות שונות ונבחר את הטובה ביותר
+async function determineDataDirectory() {
+  const dirsToCheck = [PRODUCTION_DATA_DIR, DEV_DATA_DIR, DIST_DATA_DIR];
+  
+  for (const dir of dirsToCheck) {
+    try {
+      await fs.access(dir);
+      const projectsFile = path.join(dir, 'projects.json');
+      const projects = JSON.parse(await fs.readFile(projectsFile, 'utf8'));
+      if (projects.length > 0) {
+        console.log(`📊 Found ${projects.length} projects in ${dir}`);
+        return dir;
+      }
+    } catch (error) {
+      // תיקייה לא קיימת או ריקה, נמשיך הלאה
+    }
+  }
+  
+  // אם לא נמצא כלום, נחזור לברירת המחדל
+  return PRODUCTION_DATA_DIR;
+}
+
+// נתיבי הקבצים יעודכנו ב-startServer
+let PROJECTS_FILE;
+let CATEGORIES_FILE; 
+let SUPPLIERS_FILE;
 
 // Ensure data directory exists
 async function ensureDataDir() {
@@ -87,8 +114,30 @@ async function readJsonFile(filePath) {
   }
 }
 
+// גיבוי אוטומטי לפני כל שינוי
+async function createBackup(filePath) {
+  try {
+    const backupDir = path.join(path.dirname(filePath), 'backups');
+    await fs.mkdir(backupDir, { recursive: true });
+    
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const fileName = path.basename(filePath, '.json');
+    const backupPath = path.join(backupDir, `${fileName}-${timestamp}.json`);
+    
+    if (await fs.access(filePath).then(() => true).catch(() => false)) {
+      await fs.copyFile(filePath, backupPath);
+      console.log(`💾 Backup created: ${backupPath}`);
+    }
+  } catch (error) {
+    console.log(`⚠️  Backup failed (continuing anyway): ${error.message}`);
+  }
+}
+
 async function writeJsonFile(filePath, data) {
   try {
+    // יצירת גיבוי לפני שינוי
+    await createBackup(filePath);
+    
     // בדיקה שהתיקייה קיימת
     const dir = path.dirname(filePath);
     try {
@@ -116,6 +165,9 @@ async function writeJsonFile(filePath, data) {
     const verification = await fs.readFile(filePath, 'utf8');
     if (verification === jsonString) {
       console.log(`✅ File verification successful for ${filePath.split('/').pop()}`);
+      
+      // שכפול לתיקיות נוספות לבטיחות
+      await syncDataToOtherDirectories(filePath, data);
     } else {
       console.error(`❌ File verification FAILED for ${filePath.split('/').pop()}`);
     }
@@ -126,6 +178,25 @@ async function writeJsonFile(filePath, data) {
     console.error(`📍 Current working directory: ${process.cwd()}`);
     console.error(`📍 Absolute file path: ${path.resolve(filePath)}`);
     return false;
+  }
+}
+
+// סנכרון נתונים לתיקיות נוספות לבטיחות
+async function syncDataToOtherDirectories(originalFile, data) {
+  const fileName = path.basename(originalFile);
+  const dirsToSync = [PRODUCTION_DATA_DIR, DEV_DATA_DIR, DIST_DATA_DIR];
+  
+  for (const dir of dirsToSync) {
+    if (dir === path.dirname(originalFile)) continue; // לא לשכפל לתיקייה שממנה שמרנו
+    
+    try {
+      await fs.mkdir(dir, { recursive: true });
+      const targetFile = path.join(dir, fileName);
+      await fs.writeFile(targetFile, JSON.stringify(data, null, 2), 'utf8');
+      console.log(`🔄 Synced data to ${targetFile}`);
+    } catch (error) {
+      console.log(`⚠️  Sync to ${dir} failed: ${error.message}`);
+    }
   }
 }
 
@@ -519,7 +590,15 @@ async function startServer() {
   try {
     console.log('🔧 Initializing server...');
     console.log(`📁 Working directory: ${process.cwd()}`);
-    console.log(`📁 Data directory: ${DATA_DIR}`);
+    
+    // קביעת תיקיית הנתונים הטובה ביותר
+    DATA_DIR = await determineDataDirectory();
+    console.log(`📁 Selected data directory: ${DATA_DIR}`);
+    
+    // עדכון משתני הקבצים
+    PROJECTS_FILE = path.join(DATA_DIR, 'projects.json');
+    CATEGORIES_FILE = path.join(DATA_DIR, 'categories.json');
+    SUPPLIERS_FILE = path.join(DATA_DIR, 'suppliers.json');
     
     // בדיקת הרשאות לתיקיית עבודה
     try {
@@ -536,6 +615,7 @@ async function startServer() {
       console.log(`📁 Data stored in: ${DATA_DIR}`);
       console.log(`🌐 Access the app at: http://localhost:${PORT}`);
       console.log('💡 If data is not saving, run: npm run debug');
+      console.log('🔄 Auto-backup and sync enabled for all data operations');
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

@@ -5,9 +5,10 @@ interface ModalProps {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, children }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, children, size = 'medium' }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Handle Escape key
@@ -36,42 +37,56 @@ const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, children }) => {
     }
   };
 
+  const getSizeClasses = () => {
+    switch (size) {
+      case 'small':
+        return 'max-w-[95vw] sm:max-w-md';
+      case 'large':
+        return 'max-w-[95vw] sm:max-w-3xl md:max-w-4xl';
+      case 'xlarge':
+        return 'max-w-[95vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl';
+      case 'medium':
+      default:
+        return 'max-w-[95vw] sm:max-w-lg';
+    }
+  };
+
   if (!isOpen) {
     return null;
   }
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4"
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-2 sm:p-4"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      <div 
+      <div
         ref={modalRef}
-        className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+        className={`bg-white rounded-lg shadow-xl w-full ${getSizeClasses()} max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-200 sticky top-0 bg-white">
-          <h2 id="modal-title" className="text-lg font-semibold text-gray-900">
+        <div className="flex justify-between items-center p-3 sm:p-4 border-b border-gray-200 bg-white flex-shrink-0">
+          <h2 id="modal-title" className="text-base sm:text-lg font-semibold text-gray-900 pr-2">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-colors duration-200"
+            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-1.5 sm:p-2 transition-colors duration-200 touch-manipulation flex-shrink-0"
             aria-label="סגור"
             type="button"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-3 sm:p-4 md:p-6 overflow-y-auto flex-grow">
           {children}
         </div>
       </div>

@@ -422,7 +422,7 @@ const createUltraProfessionalHeader = (ws: any, project: Project, summaryData: a
       month: 'long', 
       day: 'numeric' 
     }), '', 'מספר פרויקט:', project.id.slice(-8), ''],
-    ['מוכן עבור:', 'ליטל ברנס', '', 'סטטוס פרויקט:', summaryData.profit >= 0 ? 'רווחי 📈' : 'דורש שיפור 📉', ''],
+    ['מוכן עבור:', 'מחוברות', '', 'סטטוס פרויקט:', summaryData.profit >= 0 ? 'רווחי 📈' : 'דורש שיפור 📉', ''],
     ['גרסת דוח:', 'מקצועי Pro v2.0', '', 'תאריך עדכון:', new Date().toLocaleDateString('he-IL'), ''],
     ['', '', '', '', '', ''],
   ];
@@ -522,7 +522,7 @@ const createUltraFinancialSummarySection = (ws: any, startRow: number, summaryDa
      `${summaryData.totalIncomes > 0 ? ((summaryData.profit / summaryData.totalIncomes) * 100).toFixed(1) : 0}%`, 
      summaryData.profit >= summaryData.contractAmount * 0.15 ? '🟢 רווחיות מעולה' :
      summaryData.profit >= 0 ? '🟡 רווחיות בסיסית' : '🔴 הפסד', 
-     summaryData.profit >= 0 ? 'הפרויקט מניב רווח חיובי' : 'הפרויקט בהפסד - נדרש תיקון',
+     summaryData.profit >= 0 ? 'הפרויקט מניב רווח חיובי' : 'הפרויקט בהפסד - נדרש שיפור',
      summaryData.profit < 0 ? 'ניתוח מחדש של עלויות והכנסות' : 'המשך הניהול הנוכחי'],
     ['📊 שולי רווח %', 0, `${summaryData.profitMargin.toFixed(2)}%`, 
      summaryData.profitMargin >= 20 ? '🟢 יוצא דופן' :
@@ -685,7 +685,7 @@ const getCategoryIcon = (categoryName: string): string => {
 // --- MAIN ENHANCED EXPORT FUNCTION ---
 export const exportToExcel = (project: Project, summaryData: any, categories: Category[], options: ExportOptions, suppliers?: any[]) => {
   // Ask user for whom the report is being generated
-  const recipientName = prompt('עבור מי הדוח מונפק?', 'ליטל ברנס') || 'ליטל ברנס';
+  const recipientName = prompt('עבור מי הדוח מונפק?', 'מחוברות') || 'מחוברות';
   
   // Create HTML Excel format like the example for perfect RTL support
   const now = new Date();
@@ -855,7 +855,7 @@ const createHTMLSummarySection = (project: Project, summaryData: any, categories
 
   // Company header
   html += '<table>\n';
-  html += `<tr><td colspan="6" class="company-header">🏗️ מערכת ניהול פרויקטים לקבלן | זכויות יוצרים ליטל ביטון</td></tr>\n`;
+  html += `<tr><td colspan="6" class="company-header">🏗️ מערכת ניהול פרויקטים לקבלן | מחוברות</td></tr>\n`;
   html += `<tr><td colspan="6" class="header">דוח פרימיום - ${project.name}</td></tr>\n`;
   html += `<tr><td colspan="6" class="info-row" style="text-align: center;">${project.description || 'תיאור הפרויקט'}</td></tr>\n`;
   html += '<tr><td colspan="6">&nbsp;</td></tr>\n';
@@ -916,8 +916,8 @@ const createHTMLSummarySection = (project: Project, summaryData: any, categories
       percent: `${summaryData.totalIncomes > 0 ? ((summaryData.profit / summaryData.totalIncomes) * 100).toFixed(1) : 0}%`,
       rating: summaryData.profit >= summaryData.contractAmount * 0.15 ? '🟢 רווחיות מעולה' :
                summaryData.profit >= 0 ? '🟡 רווחיות בסיסית' : '🔴 הפסד',
-      analysis: summaryData.profit >= 0 ? 'הפרויקט מניב רווח חיובי' : 'הפרויקט בהפסד - נדרש תיקון',
-      recommendation: summaryData.profit < 0 ? 'ניתוח מחדש של עלויות והכנסות' : 'המשך הניהול הנוכחי'
+      analysis: summaryData.profit >= 0 ? 'הפרויקט מניב רווח חיובי' : 'הפרויקט בהפסד - נדרש שיפור',
+      recommendation: summaryData.profit < 0 ? 'ניתוח מחדש של עלויות והכנסות - דורש שיפור' : 'המשך הניהול הנוכחי'
     }
   ];
 
@@ -947,8 +947,16 @@ const createHTMLSummarySection = (project: Project, summaryData: any, categories
   html += '<th>🏷️ קטגוריית הוצאה</th><th>סכום (₪)</th><th>אחוז מסך הוצאות</th><th>אחוז מחוזה</th><th>דירוג יעילות</th><th>המלצות לשיפור</th>\n';
   html += '</tr>\n';
 
-  // Add category data
-  categories.forEach((cat, index) => {
+  // Filter categories - only קבלני משנה וחומרי בנייה
+  const allowedCategories = categories.filter(cat => 
+    cat.name.includes('קבלני משנה') || 
+    cat.name.includes('קבלן משנה') ||
+    cat.name.includes('חומרי בנייה') ||
+    cat.name.includes('חומרים')
+  );
+
+  // Add category data (only filtered categories)
+  allowedCategories.forEach((cat, index) => {
     const categoryAmount = summaryData.expensesByCategory[cat.name] || 0;
     if (categoryAmount > 0) {
       const percentOfTotal = summaryData.totalExpenses > 0 ? (categoryAmount / summaryData.totalExpenses * 100) : 0;
@@ -1009,81 +1017,160 @@ const createHTMLSummarySection = (project: Project, summaryData: any, categories
   html += '</tr>\n';
   html += '</table>\n';
 
-  // Suppliers breakdown section
-  if (suppliers && suppliers.length > 0) {
+  // Suppliers breakdown section with agreement vs actual payment comparison
+  const projectSuppliers = project.suppliers || [];
+  if (projectSuppliers.length > 0 || (suppliers && suppliers.length > 0)) {
     html += '<br><br>\n';
     html += '<table>\n';
-    html += '<tr><td colspan="4" class="section-title">📋 פירוט הוצאות לפי ספקים</td></tr>\n';
-    html += '<tr>\n';
-    html += '<td class="subheader">שם ספק</td>\n';
-    html += '<td class="subheader">תיאור הספק</td>\n';
-    html += '<td class="subheader">סכום לפני מע"מ</td>\n';
-    html += '<td class="subheader">סכום כולל מע"מ</td>\n';
+    html += '<tr><td colspan="6" class="section-title">📋 דוח ספקים - השוואת הסכם מול תשלום בפועל</td></tr>\n';
+    html += '<tr class="header">\n';
+    html += '<th>שם ספק</th><th>סכום הסכם (₪)</th><th>שולם בפועל (₪)</th><th>הפרש (₪)</th><th>סטטוס</th><th>הערות</th>\n';
     html += '</tr>\n';
 
-    // Group expenses by supplier
-    const supplierExpenses = new Map();
-    project.expenses.forEach(expense => {
-      const supplierId = expense.supplierId || 'unknown';
-      const supplier = suppliers.find(s => s.id === supplierId) || { name: expense.supplier, description: '' };
-      
-      if (!supplierExpenses.has(supplierId)) {
-        supplierExpenses.set(supplierId, {
-          supplier: supplier,
-          totalAmount: 0,
-          totalAmountWithVat: 0,
-          expenses: []
-        });
-      }
-      
-      const supplierData = supplierExpenses.get(supplierId);
-      supplierData.totalAmount += expense.amount;
-      supplierData.totalAmountWithVat += expense.amountWithVat || expense.amount;
-      supplierData.expenses.push(expense);
-    });
+    let totalAgreement = 0;
+    let totalPaid = 0;
 
-    let totalBeforeVat = 0;
-    let totalWithVat = 0;
-
-    // Display supplier data
-    Array.from(supplierExpenses.values()).forEach((supplierData, index) => {
+    // Display project suppliers with agreement and payment data
+    projectSuppliers.forEach((projectSupplier, index) => {
+      const agreementAmount = projectSupplier.agreementAmount || 0;
+      const paidAmount = projectSupplier.paidAmount || 0;
+      const difference = paidAmount - agreementAmount;
+      totalAgreement += agreementAmount;
+      totalPaid += paidAmount;
+      
       const rowClass = index % 2 === 0 ? 'alternating' : '';
-      totalBeforeVat += supplierData.totalAmount;
-      totalWithVat += supplierData.totalAmountWithVat;
+      const statusClass = difference === 0 ? 'status-good' : 
+                         difference > 0 ? 'status-critical' : 'status-warning';
+      const statusText = difference === 0 ? '✅ תואם' : 
+                        difference > 0 ? '🔴 חריגה' : '🟡 פחות מההסכם';
       
       html += `<tr class="${rowClass}">\n`;
-      html += `<td style="font-weight: bold;">${supplierData.supplier.name}</td>\n`;
-      html += `<td>${supplierData.supplier.description || '-'}</td>\n`;
-      html += `<td class="currency">${formatCurrency(supplierData.totalAmount)}</td>\n`;
-      html += `<td class="currency">${formatCurrency(supplierData.totalAmountWithVat)}</td>\n`;
+      html += `<td style="font-weight: bold;">${projectSupplier.name}</td>\n`;
+      html += `<td class="currency">${formatCurrency(agreementAmount)}</td>\n`;
+      html += `<td class="currency">${formatCurrency(paidAmount)}</td>\n`;
+      html += `<td class="currency ${difference > 0 ? 'status-critical' : difference < 0 ? 'status-warning' : ''}" style="font-weight: bold;">${formatCurrency(difference)}</td>\n`;
+      html += `<td class="${statusClass}" style="text-align: center;">${statusText}</td>\n`;
+      html += `<td>${difference > 0 ? '⚠️ שולם יותר מההסכם - נדרש מעקב' : difference < 0 ? 'שולם פחות מההסכם' : 'תואם להסכם'}</td>\n`;
       html += '</tr>\n';
     });
 
-    // Total row for suppliers
-    html += '<tr class="total">\n';
-    html += '<td colspan="2" style="text-align: center; font-weight: bold;">💰 סה"כ כלל הספקים</td>\n';
-    html += `<td class="currency">${formatCurrency(totalBeforeVat)}</td>\n`;
-    html += `<td class="currency">${formatCurrency(totalWithVat)}</td>\n`;
-    html += '</tr>\n';
+    // Also show suppliers from expenses if they don't have project supplier entry
+    if (suppliers && suppliers.length > 0) {
+      const supplierExpenses = new Map();
+      project.expenses.forEach(expense => {
+        const supplierId = expense.supplierId || 'unknown';
+        const projectSupplier = projectSuppliers.find(ps => ps.supplierId === supplierId || ps.name === expense.supplier);
+        
+        // Only show if not already in project suppliers
+        if (!projectSupplier) {
+          const supplier = suppliers.find(s => s.id === supplierId) || { name: expense.supplier, description: '' };
+          
+          if (!supplierExpenses.has(supplierId)) {
+            supplierExpenses.set(supplierId, {
+              supplier: supplier,
+              totalAmount: 0,
+              totalAmountWithVat: 0,
+              expenses: []
+            });
+          }
+          
+          const supplierData = supplierExpenses.get(supplierId);
+          supplierData.totalAmount += expense.amount;
+          supplierData.totalAmountWithVat += expense.amountWithVat || expense.amount;
+          supplierData.expenses.push(expense);
+        }
+      });
 
-    // VAT difference row
-    const vatDifference = totalWithVat - totalBeforeVat;
-    html += '<tr class="info-row">\n';
-    html += '<td colspan="2" style="text-align: center; font-weight: bold;">🧾 סה"כ מע"מ (18%)</td>\n';
-    html += '<td colspan="2" class="currency" style="background-color: #FEF3C7; color: #D97706; font-weight: bold;">';
-    html += `${formatCurrency(vatDifference)}</td>\n`;
+      // Display suppliers from expenses
+      Array.from(supplierExpenses.values()).forEach((supplierData, index) => {
+        const rowIndex = projectSuppliers.length + index;
+        const rowClass = rowIndex % 2 === 0 ? 'alternating' : '';
+        
+        html += `<tr class="${rowClass}">\n`;
+        html += `<td style="font-weight: bold;">${supplierData.supplier.name}</td>\n`;
+        html += `<td class="currency" style="color: #6B7280;">לא הוגדר</td>\n`;
+        html += `<td class="currency">${formatCurrency(supplierData.totalAmount)}</td>\n`;
+        html += `<td class="currency" style="color: #6B7280;">-</td>\n`;
+        html += `<td class="status-warning" style="text-align: center;">⚠️ ללא הסכם</td>\n`;
+        html += `<td>מומלץ להגדיר הסכם סכום</td>\n`;
+        html += '</tr>\n';
+      });
+    }
+
+    // Total row
+    const totalDifference = totalPaid - totalAgreement;
+    html += '<tr class="total">\n';
+    html += '<td style="text-align: center; font-weight: bold;">💰 סה"כ</td>\n';
+    html += `<td class="currency" style="font-weight: bold;">${formatCurrency(totalAgreement)}</td>\n`;
+    html += `<td class="currency" style="font-weight: bold;">${formatCurrency(totalPaid)}</td>\n`;
+    html += `<td class="currency ${totalDifference > 0 ? 'status-critical' : totalDifference < 0 ? 'status-warning' : ''}" style="font-weight: bold;">${formatCurrency(totalDifference)}</td>\n`;
+    html += `<td class="${totalDifference === 0 ? 'status-good' : totalDifference > 0 ? 'status-critical' : 'status-warning'}" style="text-align: center; font-weight: bold;">${totalDifference === 0 ? '✅ תואם' : totalDifference > 0 ? '🔴 חריגה כוללת' : '🟡 פחות מההסכם'}</td>\n`;
+    html += `<td style="font-weight: bold;">${totalDifference > 0 ? '⚠️ שולם יותר מההסכם הכולל - נדרש מעקב' : totalDifference < 0 ? 'שולם פחות מההסכם הכולל' : 'כל התשלומים תואמים להסכמים'}</td>\n`;
     html += '</tr>\n';
     
     html += '</table>\n';
+  }
+
+  // Milestones section (only for full report)
+  if (includeIncomeDetails && project.milestones && project.milestones.length > 0) {
+    html += '<br><br>\n';
+    html += '<table>\n';
+    html += '<tr><td colspan="6" class="section-title">🎯 אבני דרך פרויקט</td></tr>\n';
+    html += '<tr class="header">\n';
+    html += '<th>שם אבן דרך</th><th>סכום (₪)</th><th>אחוז מחוזה</th><th>תאריך יעד</th><th>סטטוס</th><th>הערות</th>\n';
+    html += '</tr>\n';
+
+    project.milestones.forEach((milestone, index) => {
+      const isAlternating = index % 2 === 1;
+      const rowClass = isAlternating ? 'alternating' : '';
+      const percentOfContract = summaryData.contractAmount > 0 ? ((milestone.amount / summaryData.contractAmount) * 100).toFixed(1) : '0.0';
+      const statusClass = milestone.status === 'completed' ? 'status-good' : 
+                         milestone.status === 'in-progress' ? 'status-warning' : '';
+      const statusText = milestone.status === 'completed' ? '✅ הושלם' : 
+                        milestone.status === 'in-progress' ? '🟡 בתהליך' : '⏳ ממתין';
+      
+      html += `<tr class="${rowClass}">\n`;
+      html += `<td style="font-weight: bold;">${milestone.name}</td>\n`;
+      html += `<td class="currency">${formatCurrency(milestone.amount)}</td>\n`;
+      html += `<td style="text-align: center;">${percentOfContract}%</td>\n`;
+      html += `<td style="text-align: center;">${milestone.targetDate ? new Date(milestone.targetDate).toLocaleDateString('he-IL') : '-'}</td>\n`;
+      html += `<td class="${statusClass}" style="text-align: center;">${statusText}</td>\n`;
+      html += `<td>${milestone.description || '-'}</td>\n`;
+      html += '</tr>\n';
+    });
+
+    // Milestones summary
+    const totalMilestonesAmount = project.milestones.reduce((sum, m) => sum + m.amount, 0);
+    const completedMilestonesAmount = project.milestones.filter(m => m.status === 'completed').reduce((sum, m) => sum + m.amount, 0);
+    html += '<tr class="header">\n';
+    html += '<td style="font-weight: bold;">🎯 סיכום אבני דרך</td>\n';
+    html += `<td class="currency" style="font-weight: bold;">${formatCurrency(totalMilestonesAmount)}</td>\n`;
+    html += `<td style="text-align: center; font-weight: bold;">${summaryData.contractAmount > 0 ? ((totalMilestonesAmount / summaryData.contractAmount) * 100).toFixed(1) : '0.0'}%</td>\n`;
+    html += '<td colspan="2" style="text-align: center; font-weight: bold;">הושלמו: ' + formatCurrency(completedMilestonesAmount) + '</td>\n';
+    html += `<td style="font-weight: bold;">${project.milestones.length} אבני דרך</td>\n`;
+    html += '</tr>\n';
+    
+    html += '</table>\n';
+    
+    // Explanation about milestones and income status
+    html += '<div style="margin-top: 15px; padding: 10px; background-color: #EFF6FF; border-right: 4px solid #1E40AF; border-radius: 4px;">\n';
+    html += '<p style="font-size: 11px; color: #1E40AF; margin: 0;"><strong>💡 הסבר:</strong></p>\n';
+    html += '<p style="font-size: 11px; color: #374151; margin: 5px 0 0 0;">';
+    html += 'אבני דרך פרויקט הן נקודות ציון מרכזיות בפרויקט עם סכומים מוגדרים. ';
+    html += 'כשמכניסים הכנסה עם קישור לאבן דרך בסטטוס "לגבייה", זה אומר שהתשלום צפוי אך עדיין לא התקבל בפועל. ';
+    html += 'כשהתשלום מתקבל, יש לעדכן את הסטטוס ל"שולם". ';
+    html += 'סכום הפרויקט כולל את כל אבני הדרך, וכל הכנסה בפועל נרשמת בנפרד.';
+    html += '</p>\n';
+    html += '</div>\n';
   }
 
   // Income details section (only for full report)
   if (includeIncomeDetails && project.incomes && project.incomes.length > 0) {
     html += '<br><br>\n';
     html += '<table>\n';
-    html += '<tr><td colspan="6" class="section-title">💰 פירוט הכנסות מלא</td></tr>\n';
+    html += '<tr><td colspan="7" class="section-title">💰 פירוט הכנסות מלא</td></tr>\n';
     html += '<tr class="header">\n';
-    html += '<th>📅 תאריך הכנסה</th><th>📝 תיאור הכנסה</th><th>💵 סכום (₪)</th><th>📊 אחוז מחוזה</th><th>🔄 סטטוס</th><th>📋 הערות</th>\n';
+    html += '<th>📅 תאריך הכנסה</th><th>📝 תיאור הכנסה</th><th>💵 סכום (₪)</th><th>📊 אחוז מחוזה</th><th>🎯 אבן דרך</th><th>🔄 סטטוס</th><th>📋 הערות</th>\n';
     html += '</tr>\n';
 
     let cumulativeIncome = 0;
@@ -1094,12 +1181,24 @@ const createHTMLSummarySection = (project: Project, summaryData: any, categories
       const percentOfContract = summaryData.contractAmount > 0 ? ((income.amount / summaryData.contractAmount) * 100).toFixed(1) : '0.0';
       const cumulativePercent = summaryData.contractAmount > 0 ? ((cumulativeIncome / summaryData.contractAmount) * 100).toFixed(1) : '0.0';
       
+      // Find linked milestone
+      const linkedMilestone = income.milestoneId ? project.milestones?.find(m => m.id === income.milestoneId) : null;
+      const milestoneName = linkedMilestone ? linkedMilestone.name : '-';
+      
+      // Payment status
+      const paymentStatus = income.paymentStatus === 'שולם' ? '✅ שולם' : 
+                           income.paymentStatus === 'שולם חלקי' ? '🟡 שולם חלקי' : 
+                           '⏳ לגבייה';
+      const statusClass = income.paymentStatus === 'שולם' ? 'status-good' : 
+                         income.paymentStatus === 'שולם חלקי' ? 'status-warning' : '';
+      
       html += `<tr class="${rowClass}">\n`;
       html += `<td style="text-align: center;">${new Date(income.date).toLocaleDateString('he-IL')}</td>\n`;
       html += `<td>${income.description}</td>\n`;
       html += `<td class="currency">${formatCurrency(income.amount)}</td>\n`;
       html += `<td style="text-align: center;">${percentOfContract}%</td>\n`;
-      html += `<td class="status-good" style="text-align: center;">✅ אושר</td>\n`;
+      html += `<td style="text-align: center; font-size: 11px;">${milestoneName}</td>\n`;
+      html += `<td class="${statusClass}" style="text-align: center;">${paymentStatus}</td>\n`;
       html += `<td style="font-size: 11px; color: #6B7280;">מצטבר: ${formatCurrency(cumulativeIncome)} (${cumulativePercent}%)</td>\n`;
       html += '</tr>\n';
     });
@@ -1109,7 +1208,7 @@ const createHTMLSummarySection = (project: Project, summaryData: any, categories
     html += '<td colspan="2" style="font-weight: bold;">🎯 סיכום כולל הכנסות</td>\n';
     html += `<td class="currency" style="font-weight: bold;">${formatCurrency(summaryData.totalIncomes)}</td>\n`;
     html += `<td style="text-align: center; font-weight: bold;">${summaryData.contractAmount > 0 ? ((summaryData.totalIncomes / summaryData.contractAmount) * 100).toFixed(1) : '0.0'}%</td>\n`;
-    html += `<td style="text-align: center; font-weight: bold;">${summaryData.totalIncomes >= summaryData.contractAmount ? '🟢 הושלם' : '🟡 בתהליך'}</td>\n`;
+    html += '<td colspan="2" style="text-align: center; font-weight: bold;">-</td>\n';
     html += `<td style="font-weight: bold;">${project.incomes.length} תשלומים</td>\n`;
     html += '</tr>\n';
     
@@ -1157,8 +1256,16 @@ const createLegacyXLSXExport = (project: Project, summaryData: any, categories: 
       ['🏷️ קטגוריית הוצאה', 'סכום (₪)', 'אחוז מסך הוצאות', 'אחוז מחוזה', 'דירוג יעילות', 'המלצות לשיפור'],
     ];
 
-    // Add expense categories with enhanced analysis
-    categories.forEach(cat => {
+    // Filter categories - only קבלני משנה וחומרי בנייה
+    const allowedCategories = categories.filter(cat => 
+      cat.name.includes('קבלני משנה') || 
+      cat.name.includes('קבלן משנה') ||
+      cat.name.includes('חומרי בנייה') ||
+      cat.name.includes('חומרים')
+    );
+
+    // Add expense categories with enhanced analysis (only filtered categories)
+    allowedCategories.forEach(cat => {
       const categoryAmount = summaryData.expensesByCategory[cat.name] || 0;
       if (categoryAmount > 0) {
         const percentOfTotal = summaryData.totalExpenses > 0 ? (categoryAmount / summaryData.totalExpenses * 100) : 0;

@@ -48,23 +48,24 @@ const LoginPage: React.FC = () => {
       <div className="relative z-10 w-full max-w-md">
         {/* Logo/Header Section */}
         <div className="text-center mb-8">
-          <div className="mx-auto w-24 h-24 bg-white rounded-full flex items-center justify-center mb-4 shadow-2xl p-2">
+          <div className="mx-auto w-24 h-24 bg-white rounded-full flex items-center justify-center mb-4 shadow-2xl p-2 border-4 border-yellow-400">
             <img 
-              src="/logo.png" 
-              alt="לוגו מנהל פרויקטים" 
-              className="w-full h-full object-contain rounded-full"
+              src="/mechubarot_logo_M.png" 
+              alt="מחוברות - לוגו" 
+              className="w-full h-full object-contain rounded-full animate-pulse"
               onError={(e) => {
-                // Fallback to SVG if logo doesn't load
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                // Fallback to old logo if mechubarot logo doesn't load
+                e.currentTarget.src = "/logo.png";
+                e.currentTarget.className = "w-full h-full object-contain rounded-full";
               }}
             />
             <svg className="w-12 h-12 text-blue-600 hidden" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 104 0 2 2 0 00-4 0zm6 0a2 2 0 104 0 2 2 0 00-4 0z" clipRule="evenodd" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">מנהל פרויקטים לקבלן</h1>
-          <p className="text-blue-200 text-lg">מערכת ניהול פיננסי מתקדמת</p>
+          <h1 className="text-3xl font-bold text-white mb-2">מחוברות</h1>
+          <h2 className="text-xl font-semibold text-yellow-300 mb-1">ניהול מורן מרקוביץ</h2>
+          <p className="text-blue-200 text-lg">מערכת ניהול פרויקטים מתקדמת</p>
         </div>
 
         {/* Login Form */}

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { Category } from '../types';
-import { categoriesApi, ApiError } from '../services/api';
+import { Category, Subcategory } from '../types';
+import { categoriesApi } from '../services/serverApi';
 
 interface CategoriesContextType {
   categories: Category[];
@@ -9,7 +9,11 @@ interface CategoriesContextType {
   addCategory: (name: string) => Promise<void>;
   updateCategory: (id: string, newName: string) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
+  addSubcategory: (categoryId: string, name: string) => Promise<void>;
+  updateSubcategory: (categoryId: string, subcategoryId: string, newName: string) => Promise<void>;
+  deleteSubcategory: (categoryId: string, subcategoryId: string) => Promise<void>;
   getCategoryNameById: (id: string) => string;
+  getSubcategoryNameById: (categoryId: string, subcategoryId: string) => string;
   refreshCategories: () => Promise<void>;
 }
 
@@ -26,7 +30,7 @@ export const CategoriesProvider: React.FC<{ children: ReactNode }> = ({ children
   }, []);
 
   const handleError = (error: any) => {
-    if (error instanceof ApiError) {
+    if (error?.message) {
       setError(error.message);
     } else {
       setError('שגיאה לא צפויה');
@@ -97,8 +101,81 @@ export const CategoriesProvider: React.FC<{ children: ReactNode }> = ({ children
     }
   };
     
+  const addSubcategory = async (categoryId: string, name: string) => {
+    if (!name) return;
+    
+    const category = categories.find(c => c.id === categoryId);
+    if (!category) return;
+    
+    if (category.subcategories?.some(s => s.name === name)) return;
+    
+    setLoading(true);
+    setError(null);
+    try {
+      const newSubcategory = await categoriesApi.addSubcategory(categoryId, name);
+      setCategories(prev => prev.map(c => 
+        c.id === categoryId 
+          ? { ...c, subcategories: [...(c.subcategories || []), newSubcategory] }
+          : c
+      ));
+    } catch (error) {
+      handleError(error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateSubcategory = async (categoryId: string, subcategoryId: string, newName: string) => {
+    if (!newName) return;
+    
+    setLoading(true);
+    setError(null);
+    try {
+      const updatedSubcategory = await categoriesApi.updateSubcategory(categoryId, subcategoryId, newName);
+      setCategories(prev => prev.map(c => 
+        c.id === categoryId 
+          ? { 
+              ...c, 
+              subcategories: c.subcategories?.map(s => 
+                s.id === subcategoryId ? updatedSubcategory : s
+              ) 
+            }
+          : c
+      ));
+    } catch (error) {
+      handleError(error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteSubcategory = async (categoryId: string, subcategoryId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await categoriesApi.deleteSubcategory(categoryId, subcategoryId);
+      setCategories(prev => prev.map(c => 
+        c.id === categoryId 
+          ? { ...c, subcategories: c.subcategories?.filter(s => s.id !== subcategoryId) }
+          : c
+      ));
+    } catch (error) {
+      handleError(error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getCategoryNameById = (id: string) => {
     return categories.find(c => c.id === id)?.name || id;
+  };
+
+  const getSubcategoryNameById = (categoryId: string, subcategoryId: string) => {
+    const category = categories.find(c => c.id === categoryId);
+    return category?.subcategories?.find(s => s.id === subcategoryId)?.name || subcategoryId;
   };
 
   return (
@@ -109,7 +186,11 @@ export const CategoriesProvider: React.FC<{ children: ReactNode }> = ({ children
       addCategory, 
       updateCategory, 
       deleteCategory, 
+      addSubcategory,
+      updateSubcategory,
+      deleteSubcategory,
       getCategoryNameById,
+      getSubcategoryNameById,
       refreshCategories
     }}>
       {children}
